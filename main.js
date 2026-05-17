@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add fade-in classes to dynamic elements first
     const animatedElements = [
         '.section-header', 
-        '.about-intro', 
+        '.about-grid', 
         '.pillar-card', 
         '.product-card', 
         '.calculator-wrapper', 
@@ -160,6 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
             density: 1.2,
             stability: 'Hoàn Hảo & Siêu Cứng (98%)',
             advice: 'Rigid One lý tưởng cho các chi tiết kết cấu kỹ thuật chịu lực nén ép hoặc ren xoắn ốc trực tiếp. Sau khi rửa sạch bằng cồn, bắt buộc phải sấy nhiệt nhẹ (50°C) kết hợp phơi UV trong vòng 10-15 phút để tăng tối đa liên kết ngang phân tử và độ bền cơ lý học.'
+        },
+        clear: {
+            name: 'Crystal Clear',
+            baseExposure: 2.6,
+            density: 1.12,
+            stability: 'Tuyệt Vời & Kháng Ố (92%)',
+            advice: 'Crystal Clear mang lại độ trong suốt vượt trội như thủy tinh. Chú ý: Tránh rửa trong cồn IPA quá lâu (quá 3 phút) để tránh bề mặt bị mờ sương trắng. Khuyên dùng cồn sạch 99% để rửa, sau đó phủ một lớp sơn Clear Coat Acrylic kháng UV mỏng để mẫu đạt độ trong quang học tối ưu nhất.'
         }
     };
 
