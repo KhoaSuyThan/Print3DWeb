@@ -677,68 +677,182 @@ img {
     margin-top: 40px;
 }
 
+/* Unique variables for each card theme */
+.pillar-card.pillar-domestic {
+    --pillar-color: #00f2fe;
+    --pillar-color-rgb: 0, 242, 254;
+    --pillar-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+}
+
+.pillar-card.pillar-global {
+    --pillar-color: #bd00ff;
+    --pillar-color-rgb: 189, 0, 255;
+    --pillar-gradient: linear-gradient(135deg, #bd00ff 0%, #e800ff 100%);
+}
+
+.pillar-card.pillar-rd {
+    --pillar-color: #00f5a0;
+    --pillar-color-rgb: 0, 245, 160;
+    --pillar-gradient: linear-gradient(135deg, #00f5a0 0%, #00d9f6 100%);
+}
+
 .pillar-card {
-    background: var(--bg-card);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(11, 19, 41, 0.45);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: var(--border-radius-md);
-    padding: 40px 32px;
-    transition: var(--transition-smooth);
+    padding: 45px 36px;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+    box-shadow: 0 10px 35px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-.pillar-card::before {
+/* Beautiful dynamic glow blob behind the card content */
+.pillar-glow {
+    position: absolute;
+    top: -20%;
+    right: -20%;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(var(--pillar-color-rgb), 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Big faint watermark number in the background */
+.pillar-number {
+    position: absolute;
+    bottom: -15px;
+    right: 15px;
+    font-size: 7.5rem;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    color: rgba(255, 255, 255, 0.015);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    z-index: -1;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Card hover animation */
+.pillar-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(var(--pillar-color-rgb), 0.35);
+    background: rgba(11, 19, 41, 0.65);
+    box-shadow: 
+        0 25px 50px -15px rgba(0, 0, 0, 0.7),
+        0 0 35px rgba(var(--pillar-color-rgb), 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.pillar-card:hover .pillar-glow {
+    top: -10%;
+    right: -10%;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(var(--pillar-color-rgb), 0.22) 0%, transparent 70%);
+}
+
+.pillar-card:hover .pillar-number {
+    color: rgba(var(--pillar-color-rgb), 0.04);
+    transform: translateY(-5px) scale(1.05);
+}
+
+/* Neon bottom expanding accent bar */
+.pillar-card::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45px;
+    height: 3px;
+    background: var(--pillar-gradient);
+    border-radius: 3px 3px 0 0;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pillar-card:hover::after {
     width: 100%;
-    height: 100%;
-    background: var(--gradient-card-glow);
-    opacity: 0;
-    transition: var(--transition-smooth);
-    pointer-events: none;
+    box-shadow: 0 -2px 10px rgba(var(--pillar-color-rgb), 0.5);
 }
 
-.pillar-card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(0, 242, 254, 0.3);
-    box-shadow: var(--shadow-md);
-}
-
-.pillar-card:hover::before {
-    opacity: 1;
-}
-
+/* Premium Icon styling with glowing rings */
 .pillar-icon-wrapper {
-    width: 70px;
-    height: 70px;
-    background: rgba(0, 242, 254, 0.08);
-    border-radius: var(--border-radius-sm);
+    width: 68px;
+    height: 68px;
+    background: rgba(var(--pillar-color-rgb), 0.05);
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--primary);
-    margin-bottom: 24px;
-    transition: var(--transition-smooth);
-    border: 1px solid rgba(0, 242, 254, 0.15);
+    color: var(--pillar-color);
+    margin-bottom: 28px;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(var(--pillar-color-rgb), 0.15);
+    position: relative;
+    box-shadow: inset 0 0 12px rgba(var(--pillar-color-rgb), 0.05);
+}
+
+.pillar-icon-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 22px;
+    border: 1px solid rgba(var(--pillar-color-rgb), 0.05);
+    opacity: 1;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .pillar-card:hover .pillar-icon-wrapper {
-    background: var(--primary);
+    background: var(--pillar-gradient);
     color: #030712;
-    box-shadow: var(--shadow-glow);
-    transform: scale(1.05);
+    transform: scale(1.05) rotate(5deg);
+    border-color: transparent;
+    box-shadow: 0 0 20px rgba(var(--pillar-color-rgb), 0.4);
 }
 
+.pillar-card:hover .pillar-icon-wrapper::before {
+    border-color: rgba(var(--pillar-color-rgb), 0.25);
+    transform: scale(1.08);
+}
+
+/* Typography styles */
 .pillar-card h3 {
-    font-size: 1.35rem;
+    font-size: 1.45rem;
+    font-weight: 700;
     margin-bottom: 16px;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    letter-spacing: -0.01em;
+}
+
+.pillar-card:hover h3 {
+    background: var(--pillar-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .pillar-card p {
     color: var(--text-secondary);
     font-size: 0.95rem;
+    line-height: 1.65;
+    transition: all 0.3s ease;
+}
+
+.pillar-card:hover p {
+    color: rgba(243, 244, 246, 0.9);
 }
 
 /* ==========================================================================
