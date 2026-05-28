@@ -561,62 +561,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
     // 5. Interactive Resin & Print Calculator Engine
     // ==========================================================================
-    const resinDb = {
-        basic: {
-            name: 'Basic v.18',
-            baseExposure: 2.8, // for 50 microns
-            density: 1.1,      // g/ml
-            stabilityVi: 'Khá Tốt (85%)',
-            stabilityEn: 'Good (85%)',
-            adviceVi: 'Dòng nhựa Basic v.18 có độ tương thích máy in cực rộng. Rất phù hợp cho các mô hình nghiên cứu đa dụng học tập, cấu trúc dày. Khuyến nghị thời gian phơi sáng lớp đáy (bottom exposure) là 25s - 35s cho 6 lớp đầu để bám bàn chắc chắn.',
-            adviceEn: 'Basic v.18 resin has extremely wide printer compatibility. Ideal for general purpose learning, research, and thick models. Recommended bottom exposure is 25s - 35s for the first 6 layers to ensure bed adhesion.'
-        },
-        art: {
-            name: 'Art Resin',
-            baseExposure: 2.2,
-            density: 1.15,
-            stabilityVi: 'Tuyệt Vời (90%)',
-            stabilityEn: 'Excellent (90%)',
-            adviceVi: 'Art Resin chuyên dùng cho các chi tiết mỹ thuật đòi hỏi độ phân giải siêu nét (như nhân vật Anime, kiến trúc thu nhỏ). Khuyên dùng màn hình in Mono 4K/8K. Rửa sạch mô hình bằng cồn IPA 95% và phơi đèn UV bổ sung trong 3-5 phút để đạt độ cứng tối đa.',
-            adviceEn: 'Art Resin is specialized for art parts requiring ultra-sharp details (like Anime figures, miniature architecture). Mono 4K/8K printer screens recommended. Wash model in 95% IPA and post-cure under UV light for 3-5 minutes to reach maximum hardness.'
-        },
-        flexible: {
-            name: 'Flexible Resin',
-            baseExposure: 3.2,
-            density: 1.05,
-            stabilityVi: 'Tốt & Đàn Hồi (80%)',
-            stabilityEn: 'Good & Elastic (80%)',
-            adviceVi: 'Flexible Resin tạo ra mô hình có độ dẻo đàn hồi cao. Chú ý: Hãy giảm tốc độ nhấc bàn in (Lift Speed) xuống khoảng 40-55 mm/min để tránh lực hút chân không làm rách màng FEP đáy khay chứa. Cần thiết kế lực chống support dày hơn thông thường.',
-            adviceEn: 'Flexible Resin produces parts with high elasticity. Note: Reduce build plate lift speed to 40-55 mm/min to prevent vacuum forces from tearing FEP film. Thicker support tips than standard are recommended.'
-        },
-        dental: {
-            name: 'Dental Model',
-            baseExposure: 2.8,
-            density: 1.1,
-            stabilityVi: 'Cực Tốt & Chính Xác (95%)',
-            stabilityEn: 'Excellent & Accurate (95%)',
-            adviceVi: 'Dòng nhựa Nha khoa Dental Model yêu cầu độ sạch tối đa ở khay chứa (VAT) và màn hình in. Nên in ở nhiệt độ phòng ổn định từ 25-30°C để đảm bảo độ mịn bề mặt hoàn hảo và sai lệch kích thước nhỏ nhất. Thích hợp in máng chỉnh nha, hướng dẫn implant.',
-            adviceEn: 'Dental Model resin requires maximum cleanliness in the vat and LCD screen. Keep room temperature stable at 25-30°C for perfect surface finish and minimal dimensional deviation. Ideal for ortho models and implant guides.'
-        },
-        rigid: {
-            name: 'Rigid One',
-            baseExposure: 2.8,
-            density: 1.2,
-            stabilityVi: 'Hoàn Hảo & Siêu Cứng (98%)',
-            stabilityEn: 'Perfect & Ultra Rigid (98%)',
-            adviceVi: 'Rigid One lý tưởng cho các chi tiết kết cấu kỹ thuật chịu lực nén ép hoặc ren xoắn ốc trực tiếp. Sau khi rửa sạch bằng cồn, bắt buộc phải sấy nhiệt nhẹ (50°C) kết hợp phơi UV trong vòng 10-15 phút để tăng tối đa liên kết ngang phân tử và độ bền cơ lý học.',
-            adviceEn: 'Rigid One is ideal for engineering structural parts subject to compression or direct threading. After washing in alcohol, hot-curing at 50°C combined with 10-15 mins UV curing is mandatory to maximize cross-linking and mechanical properties.'
-        },
-        clear: {
-            name: 'Crystal Clear',
-            baseExposure: 2.6,
-            density: 1.12,
-            stabilityVi: 'Tuyệt Vời & Kháng Ố (92%)',
-            stabilityEn: 'Excellent & Yellowing Resistant (92%)',
-            adviceVi: 'Crystal Clear mang lại độ trong suốt vượt trội như thủy tinh. Chú ý: Tránh rửa trong cồn IPA quá lâu (quá 3 phút) để tránh bề mặt bị mờ sương trắng. Khuyên dùng cồn sạch 99% để rửa, sau đó phủ một lớp sơn Clear Coat Acrylic kháng UV mỏng để mẫu đạt độ trong quang học tối ưu nhất.',
-            adviceEn: 'Crystal Clear delivers glass-like transparency. Warning: Avoid washing in IPA for over 3 minutes to prevent surface frosting. Recommend using fresh 99% alcohol, then applying a thin UV-resistant clear acrylic coating for optimal optical clarity.'
+    let resinDb = {};
+
+    // Load Resins from API
+    async function loadResins() {
+        try {
+            const response = await fetch('http://localhost:3000/api/resins');
+            if (response.ok) {
+                const data = await response.json();
+                data.forEach(r => {
+                    resinDb[r.Code] = {
+                        name: r.Name,
+                        baseExposure: r.BaseExposure,
+                        density: r.Density,
+                        stabilityVi: r.StabilityVi,
+                        stabilityEn: r.StabilityEn,
+                        adviceVi: r.AdviceVi,
+                        adviceEn: r.AdviceEn
+                    };
+                });
+                runCalculator();
+            }
+        } catch (error) {
+            console.error('Error fetching resins:', error);
         }
-    };
+    }
+    loadResins();
 
     const selectResin = document.getElementById('calc-resin');
     const inputVolume = document.getElementById('calc-volume');
@@ -788,7 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Quote Request Form
     if (quoteForm) {
-        quoteForm.addEventListener('submit', (e) => {
+        quoteForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = quoteForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
@@ -799,24 +769,40 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = t["form.submittingQuote"];
             submitBtn.style.opacity = '0.75';
 
-            setTimeout(() => {
-                // Success state
+            const name = document.getElementById('q-name').value;
+            const email = document.getElementById('q-email').value;
+            const phone = document.getElementById('q-phone').value;
+            const resin = document.getElementById('q-resin').value;
+            const message = document.getElementById('q-msg').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/quote-requests', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName: name, email, phone, resin, message })
+                });
+
+                if (response.ok) {
+                    const successMsg = t["toast.quoteSuccessMsg"].replace('{name}', name);
+                    showToast(t["toast.quoteSuccessTitle"], successMsg, 'success');
+                    quoteForm.reset();
+                } else {
+                    showToast('Lỗi / Error', 'Không thể gửi yêu cầu. / Cannot submit request.', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Lỗi / Error', 'Lỗi máy chủ. / Server error.', 'error');
+            } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
                 submitBtn.style.opacity = '1';
-
-                const name = document.getElementById('q-name').value;
-                const successMsg = t["toast.quoteSuccessMsg"].replace('{name}', name);
-                showToast(t["toast.quoteSuccessTitle"], successMsg, 'success');
-
-                quoteForm.reset();
-            }, 1200);
+            }
         });
     }
 
     // Distributor Registration Form
     if (distributorForm) {
-        distributorForm.addEventListener('submit', (e) => {
+        distributorForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = distributorForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
@@ -827,18 +813,34 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = t["form.submittingDist"];
             submitBtn.style.opacity = '0.75';
 
-            setTimeout(() => {
-                // Success state
+            const company = document.getElementById('d-company').value;
+            const contact = document.getElementById('d-contact').value;
+            const phone = document.getElementById('d-phone').value;
+            const city = document.getElementById('d-city').value;
+            const volume = document.getElementById('d-volume').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/distributors', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ companyName: company, contactPerson: contact, zaloPhone: phone, city, estimatedVolume: volume })
+                });
+
+                if (response.ok) {
+                    const successMsg = t["toast.distSuccessMsg"].replace('{company}', company);
+                    showToast(t["toast.distSuccessTitle"], successMsg, 'success');
+                    distributorForm.reset();
+                } else {
+                    showToast('Lỗi / Error', 'Không thể gửi đăng ký. / Cannot submit application.', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Lỗi / Error', 'Lỗi máy chủ. / Server error.', 'error');
+            } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
                 submitBtn.style.opacity = '1';
-
-                const company = document.getElementById('d-company').value;
-                const successMsg = t["toast.distSuccessMsg"].replace('{company}', company);
-                showToast(t["toast.distSuccessTitle"], successMsg, 'success');
-
-                distributorForm.reset();
-            }, 1500);
+            }
         });
     }
 

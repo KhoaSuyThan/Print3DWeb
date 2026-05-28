@@ -1220,6 +1220,7 @@ img {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    height: 150px;
 }
 
 .result-label {
@@ -1247,6 +1248,7 @@ img {
     border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
     margin-bottom: 24px;
     font-size: 0.9rem;
+    min-height: 160px;
 }
 
 .advice-heading {
