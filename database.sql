@@ -56,3 +56,27 @@ VALUES
 ('rigid', 'Rigid One', 2.8, 1.2, N'Hoàn Hảo & Siêu Cứng (98%)', 'Perfect & Ultra Rigid (98%)', N'Rigid One lý tưởng cho các chi tiết kết cấu kỹ thuật chịu lực nén ép hoặc ren xoắn ốc trực tiếp. Sau khi rửa sạch bằng cồn, bắt buộc phải sấy nhiệt nhẹ (50°C) kết hợp phơi UV trong vòng 10-15 phút để tăng tối đa liên kết ngang phân tử và độ bền cơ lý học.', 'Rigid One is ideal for engineering structural parts subject to compression or direct threading. After washing in alcohol, hot-curing at 50°C combined with 10-15 mins UV curing is mandatory to maximize cross-linking and mechanical properties.'),
 ('clear', 'Crystal Clear', 2.6, 1.12, N'Tuyệt Vời & Kháng Ố (92%)', 'Excellent & Yellowing Resistant (92%)', N'Crystal Clear mang lại độ trong suốt vượt trội như thủy tinh. Chú ý: Tránh rửa trong cồn IPA quá lâu (quá 3 phút) để tránh bề mặt bị mờ sương trắng. Khuyên dùng cồn sạch 99% để rửa, sau đó phủ một lớp sơn Clear Coat Acrylic kháng UV mỏng để mẫu đạt độ trong quang học tối ưu nhất.', 'Crystal Clear delivers glass-like transparency. Warning: Avoid washing in IPA for over 3 minutes to prevent surface frosting. Recommend using fresh 99% alcohol, then applying a thin UV-resistant clear acrylic coating for optimal optical clarity.');
 GO
+
+-- 4. Bảng lưu trữ tài khoản Admin (AdminUsers)
+CREATE TABLE AdminUsers (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Username NVARCHAR(50) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(255) NOT NULL, -- Sẽ lưu mật khẩu dạng plaintext tĩnh hoặc hash đơn giản
+    Role NVARCHAR(50) DEFAULT 'Admin',
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+GO
+
+-- Thêm tài khoản admin mặc định (Mật khẩu là 123456)
+INSERT INTO AdminUsers (Username, PasswordHash) VALUES ('admin', '123456');
+GO
+
+-- 5. Bảng lưu vết tính toán (CalculatorLogs)
+CREATE TABLE CalculatorLogs (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ResinCode NVARCHAR(50) NOT NULL,
+    Volume DECIMAL(10,2) NOT NULL,
+    LayerHeight DECIMAL(10,2) NOT NULL,
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+GO

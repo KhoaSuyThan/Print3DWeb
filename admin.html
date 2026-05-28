@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RightChoice VN - Admin Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Màn hình Đăng nhập -->
+    <div id="login-screen" class="screen active">
+        <div class="login-card">
+            <h2>Quản Trị Hệ Thống</h2>
+            <form id="login-form">
+                <div class="input-group">
+                    <label>Tài khoản</label>
+                    <input type="text" id="username" required placeholder="Nhập tài khoản admin">
+                </div>
+                <div class="input-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="password" required placeholder="Nhập mật khẩu">
+                </div>
+                <div id="login-error" class="error-msg"></div>
+                <button type="submit" class="btn-primary">Đăng Nhập</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Màn hình Dashboard -->
+    <div id="dashboard-screen" class="screen">
+        <header class="dashboard-header">
+            <div class="header-brand">RightChoice VN Admin</div>
+            <div class="header-user">
+                <span>Xin chào, <b id="user-name-display">Admin</b></span>
+                <button id="logout-btn" class="btn-outline">Đăng xuất</button>
+            </div>
+        </header>
+        
+        <div class="dashboard-body">
+            <aside class="sidebar">
+                <ul class="nav-links">
+                    <li class="active" data-target="overview">Tổng quan Analytics</li>
+                    <li data-target="quotes">Yêu cầu Báo Giá</li>
+                    <li data-target="distributors">Đại lý Đăng ký</li>
+                    <li><a href="index.html" target="_blank">Xem Website</a></li>
+                </ul>
+            </aside>
+            
+            <main class="main-content">
+                <!-- Tab Overview -->
+                <div id="tab-overview" class="tab-content active">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2>Thống kê Bộ Tính Toán 3D</h2>
+                    </div>
+                    
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>Tỷ lệ Quan tâm (Loại Nhựa)</h3>
+                            <div class="canvas-container">
+                                <canvas id="pieChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Tỷ lệ Độ dày Lớp in (Layer Height)</h3>
+                            <div class="canvas-container">
+                                <canvas id="layerChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card" style="grid-column: 1 / -1;">
+                            <h3>Phân bổ Thể tích in (ml) Khách hàng Quan tâm</h3>
+                            <div class="canvas-container">
+                                <canvas id="volumeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Quotes -->
+                <div id="tab-quotes" class="tab-content">
+                    <h2>Danh sách Yêu cầu Báo giá</h2>
+                    <div class="table-container">
+                        <table id="quotes-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Khách hàng</th>
+                                    <th>Liên hệ</th>
+                                    <th>Nhựa quan tâm</th>
+                                    <th>Lời nhắn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab Distributors -->
+                <div id="tab-distributors" class="tab-content">
+                    <h2>Danh sách Đăng ký Đại lý</h2>
+                    <div class="table-container">
+                        <table id="distributors-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Công ty</th>
+                                    <th>Người liên hệ</th>
+                                    <th>Zalo</th>
+                                    <th>Thành phố</th>
+                                    <th>Sản lượng dự kiến</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

@@ -651,6 +651,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (selectResin) selectResin.addEventListener('change', runCalculator);
     if (selectLayerHeight) selectLayerHeight.addEventListener('change', runCalculator);
 
+    // Bắt sự kiện click nút Liên hệ báo giá từ Bộ tính toán để lưu Analytics
+    const btnCalcContact = document.getElementById('btn-calc-contact');
+    if (btnCalcContact) {
+        btnCalcContact.addEventListener('click', () => {
+            const resinType = selectResin ? selectResin.value : '';
+            const volumeVal = inputVolume ? parseFloat(inputVolume.value) || 0 : 0;
+            const layerHeightVal = selectLayerHeight ? parseFloat(selectLayerHeight.value) : 0;
+            
+            fetch('http://localhost:3000/api/analytics/calculator', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    resinCode: resinType,
+                    volume: volumeVal,
+                    layerHeight: layerHeightVal
+                })
+            }).catch(e => console.log('Analytics Error:', e));
+        });
+    }
 
     // ==========================================================================
     // 6. Showcase Cards - Select Resin Shortcut
