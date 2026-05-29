@@ -15,20 +15,33 @@
 
     <!-- Màn hình Đăng nhập -->
     <div id="login-screen" class="screen active">
-        <div class="login-card">
-            <h2>Quản Trị Hệ Thống</h2>
-            <form id="login-form">
-                <div class="input-group">
-                    <label>Tài khoản</label>
-                    <input type="text" id="username" required placeholder="Nhập tài khoản admin">
+        <div class="login-wrapper">
+            <div class="glow-orb"></div>
+            <div class="login-card">
+                <div class="login-brand">
+                    <i class="ph-fill ph-rocket-launch"></i>
                 </div>
-                <div class="input-group">
-                    <label>Mật khẩu</label>
-                    <input type="password" id="password" required placeholder="Nhập mật khẩu">
-                </div>
-                <div id="login-error" class="error-msg"></div>
-                <button type="submit" class="btn-primary">Đăng Nhập</button>
-            </form>
+                <h2>Đăng Nhập Quản Trị</h2>
+                <p class="login-subtitle">Chào mừng trở lại! Vui lòng đăng nhập để tiếp tục.</p>
+                <form id="login-form">
+                    <div class="input-group">
+                        <label>Tài khoản</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-user"></i>
+                            <input type="text" id="username" required placeholder="Nhập tài khoản admin">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Mật khẩu</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-lock-key"></i>
+                            <input type="password" id="password" required placeholder="Nhập mật khẩu">
+                        </div>
+                    </div>
+                    <div id="login-error" class="error-msg"></div>
+                    <button type="submit" class="btn-primary login-btn">Đăng Nhập <i class="ph ph-arrow-right"></i></button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -49,6 +62,7 @@
                     <li class="active" data-target="overview"><i class="ph ph-squares-four"></i> Tổng quan Analytics</li>
                     <li data-target="quotes"><i class="ph ph-envelope-simple-open"></i> Yêu cầu Báo Giá</li>
                     <li data-target="distributors"><i class="ph ph-users"></i> Đại lý Đăng ký</li>
+                    <li data-target="ai-config"><i class="ph ph-robot"></i> Quản lý AI</li>
                 </ul>
                 <div class="sidebar-section" style="margin-top: 24px;">HỆ THỐNG</div>
                 <ul class="nav-links">
@@ -159,6 +173,16 @@
                                 <!-- Data will be populated here -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Tab AI Config (Coming Soon) -->
+                <div id="tab-ai-config" class="tab-content">
+                    <h2><i class="ph ph-robot"></i> Quản lý AI</h2>
+                    <div class="chart-card" style="text-align: center; padding: 60px 20px;">
+                        <i class="ph ph-hammer" style="font-size: 4rem; color: var(--primary); margin-bottom: 20px; display: inline-block;"></i>
+                        <h3 style="color: var(--text-main); font-size: 1.5rem; margin-bottom: 10px;">Tính năng đang được phát triển</h3>
+                        <p style="color: var(--text-muted);">Giao diện quản lý và cấu hình trí tuệ nhân tạo sẽ sớm ra mắt trong các phiên bản cập nhật tới.</p>
                     </div>
                 </div>
 

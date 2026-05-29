@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (target === 'overview') {
                     loadAnalytics();
-                } else {
+                } else if (target === 'quotes' || target === 'distributors') {
                     loadData(target);
                 }
             });
