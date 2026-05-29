@@ -6,6 +6,8 @@
     <title>RightChoice VN - Admin Dashboard</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -33,28 +35,64 @@
     <!-- Màn hình Dashboard -->
     <div id="dashboard-screen" class="screen">
         <header class="dashboard-header">
-            <div class="header-brand">RightChoice VN Admin</div>
+            <div class="header-brand"><i class="ph-fill ph-rocket-launch"></i> RightChoice Admin</div>
             <div class="header-user">
                 <span>Xin chào, <b id="user-name-display">Admin</b></span>
-                <button id="logout-btn" class="btn-outline">Đăng xuất</button>
+                <button id="logout-btn" class="btn-outline"><i class="ph ph-sign-out"></i> Đăng xuất</button>
             </div>
         </header>
         
         <div class="dashboard-body">
             <aside class="sidebar">
+                <div class="sidebar-section">QUẢN LÝ DỮ LIỆU</div>
                 <ul class="nav-links">
-                    <li class="active" data-target="overview">Tổng quan Analytics</li>
-                    <li data-target="quotes">Yêu cầu Báo Giá</li>
-                    <li data-target="distributors">Đại lý Đăng ký</li>
-                    <li><a href="index.html" target="_blank">Xem Website</a></li>
+                    <li class="active" data-target="overview"><i class="ph ph-squares-four"></i> Tổng quan Analytics</li>
+                    <li data-target="quotes"><i class="ph ph-envelope-simple-open"></i> Yêu cầu Báo Giá</li>
+                    <li data-target="distributors"><i class="ph ph-users"></i> Đại lý Đăng ký</li>
+                </ul>
+                <div class="sidebar-section" style="margin-top: 24px;">HỆ THỐNG</div>
+                <ul class="nav-links">
+                    <li><a href="index.html" target="_blank"><i class="ph ph-globe"></i> Xem Website</a></li>
                 </ul>
             </aside>
             
             <main class="main-content">
                 <!-- Tab Overview -->
                 <div id="tab-overview" class="tab-content active">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2>Thống kê Bộ Tính Toán 3D</h2>
+                    <div class="overview-header">
+                        <h2>Quản trị Hệ thống</h2>
+                        <p>Chào buổi chiều, Admin! Đây là tình hình hệ thống hôm nay.</p>
+                    </div>
+
+                    <div class="kpi-grid">
+                        <div class="kpi-card blue">
+                            <div class="kpi-title">Yêu cầu Báo Giá</div>
+                            <div class="kpi-value" id="kpi-quotes">--</div>
+                            <div class="kpi-desc">Tổng số yêu cầu từ khách</div>
+                            <i class="ph-fill ph-file-text kpi-icon"></i>
+                        </div>
+                        <div class="kpi-card green">
+                            <div class="kpi-title">Đại lý Đăng ký</div>
+                            <div class="kpi-value" id="kpi-distributors">--</div>
+                            <div class="kpi-desc">Đối tác quan tâm</div>
+                            <i class="ph-fill ph-handshake kpi-icon"></i>
+                        </div>
+                        <div class="kpi-card orange">
+                            <div class="kpi-title">Lượt tính toán 3D</div>
+                            <div class="kpi-value" id="kpi-calculator">--</div>
+                            <div class="kpi-desc">Tổng lượt sử dụng công cụ</div>
+                            <i class="ph-fill ph-calculator kpi-icon"></i>
+                        </div>
+                        <div class="kpi-card red">
+                            <div class="kpi-title">Truy cập Website</div>
+                            <div class="kpi-value">1,245</div>
+                            <div class="kpi-desc">Tăng 15% tuần này</div>
+                            <i class="ph-fill ph-globe kpi-icon"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="charts-header">
+                        <h3><i class="ph ph-chart-polar"></i> Thống kê Bộ Tính Toán 3D</h3>
                     </div>
                     
                     <div class="charts-grid">
@@ -81,7 +119,7 @@
 
                 <!-- Tab Quotes -->
                 <div id="tab-quotes" class="tab-content">
-                    <h2>Danh sách Yêu cầu Báo giá</h2>
+                    <h2><i class="ph ph-file-text"></i> Danh sách Yêu cầu Báo giá</h2>
                     <div class="table-container">
                         <table id="quotes-table">
                             <thead>
@@ -103,7 +141,7 @@
 
                 <!-- Tab Distributors -->
                 <div id="tab-distributors" class="tab-content">
-                    <h2>Danh sách Đăng ký Đại lý</h2>
+                    <h2><i class="ph ph-handshake"></i> Danh sách Đăng ký Đại lý</h2>
                     <div class="table-container">
                         <table id="distributors-table">
                             <thead>

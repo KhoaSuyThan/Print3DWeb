@@ -12,6 +12,10 @@ app.use(express.json());
 // Phục vụ các file tĩnh (Frontend) từ thư mục gốc
 app.use(express.static(path.join(__dirname, '..')));
 
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'admin.html'));
+});
+
 const connectionString = `Driver={ODBC Driver 17 for SQL Server};Server=${process.env.DB_SERVER};Database=${process.env.DB_NAME};Trusted_Connection=yes;`;
 const dbConfig = {
     connectionString: connectionString
