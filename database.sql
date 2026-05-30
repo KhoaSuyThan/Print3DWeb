@@ -30,7 +30,7 @@ CREATE TABLE DistributorApplications (
 GO
 
 -- 3. (Tùy chọn) Bảng lưu trữ thông số các dòng nhựa (Resins/Products)
--- Để sau này không cần hardcode trong main.js
+-- Đã chuyển hoàn toàn sang Dynamic CMS
 CREATE TABLE Resins (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Code NVARCHAR(50) NOT NULL UNIQUE, -- VD: basic, art, flexible...
@@ -41,20 +41,41 @@ CREATE TABLE Resins (
     StabilityEn NVARCHAR(200) NOT NULL,
     AdviceVi NVARCHAR(MAX) NOT NULL,
     AdviceEn NVARCHAR(MAX) NOT NULL,
+    
+    -- Các trường mở rộng cho trang hiển thị Sản phẩm (CMS)
+    DescriptionVi NVARCHAR(500) NULL,
+    DescriptionEn NVARCHAR(500) NULL,
+    BadgeColor NVARCHAR(50) NULL,      -- VD: badge-blue
+    BadgeTextVi NVARCHAR(100) NULL,    -- VD: Dòng Phổ Thông
+    BadgeTextEn NVARCHAR(100) NULL,    -- VD: Standard Resin
+    
+    StatExposureText NVARCHAR(100) NULL, -- VD: 2.5 - 3.2 s/layer
+    StatBarWidth INT NULL,               -- VD: 80 (%)
+    
+    Prop1LabelVi NVARCHAR(50) NULL,
+    Prop1LabelEn NVARCHAR(50) NULL,
+    Prop1ValueVi NVARCHAR(50) NULL,
+    Prop1ValueEn NVARCHAR(50) NULL,
+    
+    Prop2LabelVi NVARCHAR(50) NULL,
+    Prop2LabelEn NVARCHAR(50) NULL,
+    Prop2ValueVi NVARCHAR(50) NULL,
+    Prop2ValueEn NVARCHAR(50) NULL,
+    
+    Prop3LabelVi NVARCHAR(50) NULL,
+    Prop3LabelEn NVARCHAR(50) NULL,
+    Prop3ValueVi NVARCHAR(50) NULL,
+    Prop3ValueEn NVARCHAR(50) NULL,
+    
+    ImageUrl NVARCHAR(255) NULL,       -- Đường dẫn ảnh sản phẩm
+    IsFeatured BIT DEFAULT 0,          -- 1: Nổi bật (hiển thị thẻ to)
+    
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME DEFAULT GETDATE()
 );
 GO
 
--- Insert dữ liệu mẫu cho bảng Resins dựa trên main.js hiện tại
-INSERT INTO Resins (Code, Name, BaseExposure, Density, StabilityVi, StabilityEn, AdviceVi, AdviceEn)
-VALUES 
-('basic', 'Basic v.18', 2.8, 1.1, N'Khá Tốt (85%)', 'Good (85%)', N'Dòng nhựa Basic v.18 có độ tương thích máy in cực rộng. Rất phù hợp cho các mô hình nghiên cứu đa dụng học tập, cấu trúc dày. Khuyến nghị thời gian phơi sáng lớp đáy (bottom exposure) là 25s - 35s cho 6 lớp đầu để bám bàn chắc chắn.', 'Basic v.18 resin has extremely wide printer compatibility. Ideal for general purpose learning, research, and thick models. Recommended bottom exposure is 25s - 35s for the first 6 layers to ensure bed adhesion.'),
-('art', 'Art Resin', 2.2, 1.15, N'Tuyệt Vời (90%)', 'Excellent (90%)', N'Art Resin chuyên dùng cho các chi tiết mỹ thuật đòi hỏi độ phân giải siêu nét (như nhân vật Anime, kiến trúc thu nhỏ). Khuyên dùng màn hình in Mono 4K/8K. Rửa sạch mô hình bằng cồn IPA 95% và phơi đèn UV bổ sung trong 3-5 phút để đạt độ cứng tối đa.', 'Art Resin is specialized for art parts requiring ultra-sharp details (like Anime figures, miniature architecture). Mono 4K/8K printer screens recommended. Wash model in 95% IPA and post-cure under UV light for 3-5 minutes to reach maximum hardness.'),
-('flexible', 'Flexible Resin', 3.2, 1.05, N'Tốt & Đàn Hồi (80%)', 'Good & Elastic (80%)', N'Flexible Resin tạo ra mô hình có độ dẻo đàn hồi cao. Chú ý: Hãy giảm tốc độ nhấc bàn in (Lift Speed) xuống khoảng 40-55 mm/min để tránh lực hút chân không làm rách màng FEP đáy khay chứa. Cần thiết kế lực chống support dày hơn thông thường.', 'Flexible Resin produces parts with high elasticity. Note: Reduce build plate lift speed to 40-55 mm/min to prevent vacuum forces from tearing FEP film. Thicker support tips than standard are recommended.'),
-('dental', 'Dental Model', 2.8, 1.1, N'Cực Tốt & Chính Xác (95%)', 'Excellent & Accurate (95%)', N'Dòng nhựa Nha khoa Dental Model yêu cầu độ sạch tối đa ở khay chứa (VAT) và màn hình in. Nên in ở nhiệt độ phòng ổn định từ 25-30°C để đảm bảo độ mịn bề mặt hoàn hảo và sai lệch kích thước nhỏ nhất. Thích hợp in máng chỉnh nha, hướng dẫn implant.', 'Dental Model resin requires maximum cleanliness in the vat and LCD screen. Keep room temperature stable at 25-30°C for perfect surface finish and minimal dimensional deviation. Ideal for ortho models and implant guides.'),
-('rigid', 'Rigid One', 2.8, 1.2, N'Hoàn Hảo & Siêu Cứng (98%)', 'Perfect & Ultra Rigid (98%)', N'Rigid One lý tưởng cho các chi tiết kết cấu kỹ thuật chịu lực nén ép hoặc ren xoắn ốc trực tiếp. Sau khi rửa sạch bằng cồn, bắt buộc phải sấy nhiệt nhẹ (50°C) kết hợp phơi UV trong vòng 10-15 phút để tăng tối đa liên kết ngang phân tử và độ bền cơ lý học.', 'Rigid One is ideal for engineering structural parts subject to compression or direct threading. After washing in alcohol, hot-curing at 50°C combined with 10-15 mins UV curing is mandatory to maximize cross-linking and mechanical properties.'),
-('clear', 'Crystal Clear', 2.6, 1.12, N'Tuyệt Vời & Kháng Ố (92%)', 'Excellent & Yellowing Resistant (92%)', N'Crystal Clear mang lại độ trong suốt vượt trội như thủy tinh. Chú ý: Tránh rửa trong cồn IPA quá lâu (quá 3 phút) để tránh bề mặt bị mờ sương trắng. Khuyên dùng cồn sạch 99% để rửa, sau đó phủ một lớp sơn Clear Coat Acrylic kháng UV mỏng để mẫu đạt độ trong quang học tối ưu nhất.', 'Crystal Clear delivers glass-like transparency. Warning: Avoid washing in IPA for over 3 minutes to prevent surface frosting. Recommend using fresh 99% alcohol, then applying a thin UV-resistant clear acrylic coating for optimal optical clarity.');
+-- Script INSERT dữ liệu có thể tham khảo từ /backend/migrate.js (đã bị xóa sau khi di chuyển dữ liệu)
 GO
 
 -- 4. Bảng lưu trữ tài khoản Admin (AdminUsers)

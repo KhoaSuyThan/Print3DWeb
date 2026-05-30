@@ -219,7 +219,139 @@ app.get('/api/admin/analytics', verifyToken, async (req, res) => {
         res.status(500).json({ error: 'Lỗi lấy dữ liệu analytics' });
     }
 });
+// 9. Lấy danh sách nhựa (Admin)
+app.get('/api/admin/resins', verifyToken, async (req, res) => {
+    try {
+        let pool = await sql.connect(dbConfig);
+        let result = await pool.request().query('SELECT * FROM Resins ORDER BY Id DESC');
+        res.json(result.recordset);
+    } catch (err) {
+        res.status(500).json({ error: 'Lỗi lấy dữ liệu nhựa' });
+    }
+});
 
+// 10. Thêm nhựa mới
+app.post('/api/admin/resins', verifyToken, async (req, res) => {
+    try {
+        let pool = await sql.connect(dbConfig);
+        await pool.request()
+            .input('Code', sql.NVarChar(50), req.body.Code)
+            .input('Name', sql.NVarChar(100), req.body.Name)
+            .input('BaseExposure', sql.Decimal(4,2), req.body.BaseExposure)
+            .input('Density', sql.Decimal(4,2), req.body.Density)
+            .input('StabilityVi', sql.NVarChar(200), req.body.StabilityVi)
+            .input('StabilityEn', sql.NVarChar(200), req.body.StabilityEn)
+            .input('AdviceVi', sql.NVarChar(sql.MAX), req.body.AdviceVi)
+            .input('AdviceEn', sql.NVarChar(sql.MAX), req.body.AdviceEn)
+            .input('DescriptionVi', sql.NVarChar(500), req.body.DescriptionVi)
+            .input('DescriptionEn', sql.NVarChar(500), req.body.DescriptionEn)
+            .input('BadgeColor', sql.NVarChar(50), req.body.BadgeColor)
+            .input('BadgeTextVi', sql.NVarChar(100), req.body.BadgeTextVi)
+            .input('BadgeTextEn', sql.NVarChar(100), req.body.BadgeTextEn)
+            .input('StatExposureText', sql.NVarChar(100), req.body.StatExposureText)
+            .input('StatBarWidth', sql.Int, req.body.StatBarWidth)
+            .input('Prop1LabelVi', sql.NVarChar(50), req.body.Prop1LabelVi)
+            .input('Prop1LabelEn', sql.NVarChar(50), req.body.Prop1LabelEn)
+            .input('Prop1ValueVi', sql.NVarChar(50), req.body.Prop1ValueVi)
+            .input('Prop1ValueEn', sql.NVarChar(50), req.body.Prop1ValueEn)
+            .input('Prop2LabelVi', sql.NVarChar(50), req.body.Prop2LabelVi)
+            .input('Prop2LabelEn', sql.NVarChar(50), req.body.Prop2LabelEn)
+            .input('Prop2ValueVi', sql.NVarChar(50), req.body.Prop2ValueVi)
+            .input('Prop2ValueEn', sql.NVarChar(50), req.body.Prop2ValueEn)
+            .input('Prop3LabelVi', sql.NVarChar(50), req.body.Prop3LabelVi)
+            .input('Prop3LabelEn', sql.NVarChar(50), req.body.Prop3LabelEn)
+            .input('Prop3ValueVi', sql.NVarChar(50), req.body.Prop3ValueVi)
+            .input('Prop3ValueEn', sql.NVarChar(50), req.body.Prop3ValueEn)
+            .input('ImageUrl', sql.NVarChar(255), req.body.ImageUrl)
+            .input('IsFeatured', sql.Bit, req.body.IsFeatured)
+            .input('IsActive', sql.Bit, req.body.IsActive)
+            .query(`
+                INSERT INTO Resins (
+                    Code, Name, BaseExposure, Density, StabilityVi, StabilityEn, AdviceVi, AdviceEn,
+                    DescriptionVi, DescriptionEn, BadgeColor, BadgeTextVi, BadgeTextEn, StatExposureText, StatBarWidth,
+                    Prop1LabelVi, Prop1LabelEn, Prop1ValueVi, Prop1ValueEn, Prop2LabelVi, Prop2LabelEn, Prop2ValueVi, Prop2ValueEn,
+                    Prop3LabelVi, Prop3LabelEn, Prop3ValueVi, Prop3ValueEn, ImageUrl, IsFeatured, IsActive
+                ) VALUES (
+                    @Code, @Name, @BaseExposure, @Density, @StabilityVi, @StabilityEn, @AdviceVi, @AdviceEn,
+                    @DescriptionVi, @DescriptionEn, @BadgeColor, @BadgeTextVi, @BadgeTextEn, @StatExposureText, @StatBarWidth,
+                    @Prop1LabelVi, @Prop1LabelEn, @Prop1ValueVi, @Prop1ValueEn, @Prop2LabelVi, @Prop2LabelEn, @Prop2ValueVi, @Prop2ValueEn,
+                    @Prop3LabelVi, @Prop3LabelEn, @Prop3ValueVi, @Prop3ValueEn, @ImageUrl, @IsFeatured, @IsActive
+                )
+            `);
+        res.json({ message: 'Thêm sản phẩm thành công' });
+    } catch (err) {
+        console.error('Error inserting resin:', err);
+        res.status(500).json({ error: 'Lỗi thêm sản phẩm' });
+    }
+});
+
+// 11. Cập nhật nhựa
+app.put('/api/admin/resins/:id', verifyToken, async (req, res) => {
+    try {
+        let pool = await sql.connect(dbConfig);
+        await pool.request()
+            .input('Id', sql.Int, req.params.id)
+            .input('Code', sql.NVarChar(50), req.body.Code)
+            .input('Name', sql.NVarChar(100), req.body.Name)
+            .input('BaseExposure', sql.Decimal(4,2), req.body.BaseExposure)
+            .input('Density', sql.Decimal(4,2), req.body.Density)
+            .input('StabilityVi', sql.NVarChar(200), req.body.StabilityVi)
+            .input('StabilityEn', sql.NVarChar(200), req.body.StabilityEn)
+            .input('AdviceVi', sql.NVarChar(sql.MAX), req.body.AdviceVi)
+            .input('AdviceEn', sql.NVarChar(sql.MAX), req.body.AdviceEn)
+            .input('DescriptionVi', sql.NVarChar(500), req.body.DescriptionVi)
+            .input('DescriptionEn', sql.NVarChar(500), req.body.DescriptionEn)
+            .input('BadgeColor', sql.NVarChar(50), req.body.BadgeColor)
+            .input('BadgeTextVi', sql.NVarChar(100), req.body.BadgeTextVi)
+            .input('BadgeTextEn', sql.NVarChar(100), req.body.BadgeTextEn)
+            .input('StatExposureText', sql.NVarChar(100), req.body.StatExposureText)
+            .input('StatBarWidth', sql.Int, req.body.StatBarWidth)
+            .input('Prop1LabelVi', sql.NVarChar(50), req.body.Prop1LabelVi)
+            .input('Prop1LabelEn', sql.NVarChar(50), req.body.Prop1LabelEn)
+            .input('Prop1ValueVi', sql.NVarChar(50), req.body.Prop1ValueVi)
+            .input('Prop1ValueEn', sql.NVarChar(50), req.body.Prop1ValueEn)
+            .input('Prop2LabelVi', sql.NVarChar(50), req.body.Prop2LabelVi)
+            .input('Prop2LabelEn', sql.NVarChar(50), req.body.Prop2LabelEn)
+            .input('Prop2ValueVi', sql.NVarChar(50), req.body.Prop2ValueVi)
+            .input('Prop2ValueEn', sql.NVarChar(50), req.body.Prop2ValueEn)
+            .input('Prop3LabelVi', sql.NVarChar(50), req.body.Prop3LabelVi)
+            .input('Prop3LabelEn', sql.NVarChar(50), req.body.Prop3LabelEn)
+            .input('Prop3ValueVi', sql.NVarChar(50), req.body.Prop3ValueVi)
+            .input('Prop3ValueEn', sql.NVarChar(50), req.body.Prop3ValueEn)
+            .input('ImageUrl', sql.NVarChar(255), req.body.ImageUrl)
+            .input('IsFeatured', sql.Bit, req.body.IsFeatured)
+            .input('IsActive', sql.Bit, req.body.IsActive)
+            .query(`
+                UPDATE Resins SET 
+                    Code = @Code, Name = @Name, BaseExposure = @BaseExposure, Density = @Density, 
+                    StabilityVi = @StabilityVi, StabilityEn = @StabilityEn, AdviceVi = @AdviceVi, AdviceEn = @AdviceEn,
+                    DescriptionVi = @DescriptionVi, DescriptionEn = @DescriptionEn, BadgeColor = @BadgeColor, 
+                    BadgeTextVi = @BadgeTextVi, BadgeTextEn = @BadgeTextEn, StatExposureText = @StatExposureText, StatBarWidth = @StatBarWidth,
+                    Prop1LabelVi = @Prop1LabelVi, Prop1LabelEn = @Prop1LabelEn, Prop1ValueVi = @Prop1ValueVi, Prop1ValueEn = @Prop1ValueEn, 
+                    Prop2LabelVi = @Prop2LabelVi, Prop2LabelEn = @Prop2LabelEn, Prop2ValueVi = @Prop2ValueVi, Prop2ValueEn = @Prop2ValueEn,
+                    Prop3LabelVi = @Prop3LabelVi, Prop3LabelEn = @Prop3LabelEn, Prop3ValueVi = @Prop3ValueVi, Prop3ValueEn = @Prop3ValueEn, 
+                    ImageUrl = @ImageUrl, IsFeatured = @IsFeatured, IsActive = @IsActive
+                WHERE Id = @Id
+            `);
+        res.json({ message: 'Cập nhật thành công' });
+    } catch (err) {
+        console.error('Error updating resin:', err);
+        res.status(500).json({ error: 'Lỗi cập nhật sản phẩm' });
+    }
+});
+
+// 12. Xóa/Ẩn nhựa
+app.delete('/api/admin/resins/:id', verifyToken, async (req, res) => {
+    try {
+        let pool = await sql.connect(dbConfig);
+        await pool.request()
+            .input('Id', sql.Int, req.params.id)
+            .query('DELETE FROM Resins WHERE Id = @Id');
+        res.json({ message: 'Xóa thành công' });
+    } catch (err) {
+        res.status(500).json({ error: 'Lỗi xóa sản phẩm' });
+    }
+});
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server đang chạy tại http://localhost:${PORT}`);

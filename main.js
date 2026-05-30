@@ -569,7 +569,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('http://localhost:3000/api/resins');
             if (response.ok) {
                 const data = await response.json();
+                
+                const grid = document.getElementById('dynamic-products-grid');
+                const select = document.getElementById('calc-resin');
+                
+                if (grid) grid.innerHTML = '';
+                if (select) select.innerHTML = '';
+                
                 data.forEach(r => {
+                    // Populate Dictionary
                     resinDb[r.Code] = {
                         name: r.Name,
                         baseExposure: r.BaseExposure,
@@ -579,7 +587,87 @@ document.addEventListener('DOMContentLoaded', () => {
                         adviceVi: r.AdviceVi,
                         adviceEn: r.AdviceEn
                     };
+                    
+                    // Render Grid Item
+                    if (grid) {
+                        const featuredClass = r.IsFeatured ? 'featured-product' : '';
+                        const glowHtml = r.IsFeatured ? '<div class="card-glow"></div>' : '';
+                        const imgHtml = r.ImageUrl ? `<div class="product-image-small"><img src="${r.ImageUrl}" class="card-prod-image"></div>` : '';
+                        
+                        const desc = currentLang === 'vi' ? r.DescriptionVi : r.DescriptionEn;
+                        const badge = currentLang === 'vi' ? r.BadgeTextVi : r.BadgeTextEn;
+                        const p1l = currentLang === 'vi' ? r.Prop1LabelVi : r.Prop1LabelEn;
+                        const p1v = currentLang === 'vi' ? r.Prop1ValueVi : r.Prop1ValueEn;
+                        const p2l = currentLang === 'vi' ? r.Prop2LabelVi : r.Prop2LabelEn;
+                        const p2v = currentLang === 'vi' ? r.Prop2ValueVi : r.Prop2ValueEn;
+                        const p3l = currentLang === 'vi' ? r.Prop3LabelVi : r.Prop3LabelEn;
+                        const p3v = currentLang === 'vi' ? r.Prop3ValueVi : r.Prop3ValueEn;
+                        
+                        const btnClass = r.IsFeatured ? 'btn-primary' : 'btn-outline';
+
+                        const html = `
+                        <div class="product-card ${featuredClass} fade-in" data-resin="${r.Code}">
+                            ${glowHtml}
+                            <div class="product-header">
+                                <span class="product-badge ${r.BadgeColor}">${badge}</span>
+                                <h3 class="product-name">${r.Name}</h3>
+                                <p class="product-desc">${desc}</p>
+                            </div>
+                            ${imgHtml}
+                            <div class="product-stats">
+                                <div class="stat-row">
+                                    <span class="stat-label">Thời gian phơi sáng</span>
+                                    <span class="stat-value">${r.StatExposureText}</span>
+                                </div>
+                                <div class="stat-bar-container">
+                                    <div class="stat-bar" style="width: ${r.StatBarWidth}%;"></div>
+                                </div>
+                                <div class="stat-details grid-3">
+                                    <div><span class="detail-label">${p1l}</span><span class="detail-val">${p1v}</span></div>
+                                    <div><span class="detail-label">${p2l}</span><span class="detail-val">${p2v}</span></div>
+                                    <div><span class="detail-label">${p3l}</span><span class="detail-val">${p3v}</span></div>
+                                </div>
+                            </div>
+                            <div class="product-footer">
+                                <a href="#calculator" class="btn ${btnClass} btn-full card-action-btn" data-select="${r.Code}">Tính Toán In</a>
+                            </div>
+                        </div>
+                        `;
+                        grid.insertAdjacentHTML('beforeend', html);
+                    }
+                    
+                    // Render Option
+                    if (select) {
+                        const optDesc = currentLang === 'vi' ? r.DescriptionVi : r.DescriptionEn;
+                        select.insertAdjacentHTML('beforeend', `<option value="${r.Code}">${r.Name} - ${optDesc.substring(0, 30)}...</option>`);
+                    }
                 });
+                
+                // Re-attach observers for newly created fade-in elements
+                document.querySelectorAll('.fade-in:not(.appear)').forEach(el => {
+                    animationObserver.observe(el);
+                });
+                
+                // Re-attach card-action-btn events
+                document.querySelectorAll('.card-action-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const resinType = button.getAttribute('data-select');
+                        if (resinType && document.getElementById('calc-resin')) {
+                            document.getElementById('calc-resin').value = resinType;
+                            runCalculator();
+                            
+                            const calcSec = document.getElementById('calculator');
+                            if (calcSec) {
+                                window.scrollTo({
+                                    top: calcSec.offsetTop - 80,
+                                    behavior: 'smooth'
+                                });
+                            }
+                        }
+                    });
+                });
+
                 runCalculator();
             }
         } catch (error) {

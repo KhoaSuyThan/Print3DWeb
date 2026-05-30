@@ -62,6 +62,7 @@
                     <li class="active" data-target="overview"><i class="ph ph-squares-four"></i> Tổng quan Analytics</li>
                     <li data-target="quotes"><i class="ph ph-envelope-simple-open"></i> Yêu cầu Báo Giá</li>
                     <li data-target="distributors"><i class="ph ph-users"></i> Đại lý Đăng ký</li>
+                    <li data-target="resins"><i class="ph ph-cube"></i> Sản phẩm (Resins)</li>
                     <li data-target="ai-config"><i class="ph ph-robot"></i> Quản lý AI</li>
                 </ul>
                 <div class="sidebar-section" style="margin-top: 24px;">HỆ THỐNG</div>
@@ -186,7 +187,102 @@
                     </div>
                 </div>
 
+                <!-- Tab Resins -->
+                <div id="tab-resins" class="tab-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2><i class="ph ph-cube"></i> Quản lý Sản Phẩm (Resins)</h2>
+                        <button id="add-resin-btn" class="btn-primary" style="padding: 10px 20px;"><i class="ph ph-plus"></i> Thêm Sản Phẩm</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="resins-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Code</th>
+                                    <th>Tên Sản Phẩm</th>
+                                    <th>Hiển thị</th>
+                                    <th>Nổi bật</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </main>
+        </div>
+    </div>
+
+    <!-- Modal Resin -->
+    <div id="resin-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="resin-modal-title">Thêm Sản Phẩm Mới</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="resin-form">
+                    <input type="hidden" id="r-id">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom: 15px;">
+                        <div><label>Mã (Code) *</label><input type="text" id="r-code" class="form-control" required></div>
+                        <div><label>Tên Sản Phẩm *</label><input type="text" id="r-name" class="form-control" required></div>
+                        <div><label>Màu Badge</label><input type="text" id="r-badgeColor" class="form-control" placeholder="VD: badge-blue"></div>
+                        <div><label>Hình Ảnh (URL)</label><input type="text" id="r-image" class="form-control" placeholder="VD: assets/images/dental.png"></div>
+                        <div><label>Badge Text VN</label><input type="text" id="r-badgeVi" class="form-control"></div>
+                        <div><label>Badge Text EN</label><input type="text" id="r-badgeEn" class="form-control"></div>
+                        <div><label>Thời gian phơi sáng TB *</label><input type="number" step="0.1" id="r-baseExp" class="form-control" required></div>
+                        <div><label>Mật độ (Density) *</label><input type="number" step="0.01" id="r-density" class="form-control" required></div>
+                        <div><label>Text Phơi Sáng</label><input type="text" id="r-statExp" class="form-control" placeholder="VD: 2.5-3.2 s/layer"></div>
+                        <div><label>Stat Bar %</label><input type="number" id="r-statWidth" class="form-control"></div>
+                        <div><label>Độ Ổn Định VN *</label><input type="text" id="r-stabVi" class="form-control" required></div>
+                        <div><label>Độ Ổn Định EN *</label><input type="text" id="r-stabEn" class="form-control" required></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label>Mô tả VN</label><textarea id="r-descVi" class="form-control" rows="2"></textarea>
+                        <br><label>Mô tả EN</label><textarea id="r-descEn" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom: 15px;">
+                        <div>
+                            <label>Thuộc tính 1 (Cứng)</label>
+                            <input type="text" id="r-p1lVi" placeholder="Label VN" class="form-control" style="margin-bottom:5px">
+                            <input type="text" id="r-p1lEn" placeholder="Label EN" class="form-control" style="margin-bottom:5px">
+                            <input type="text" id="r-p1vVi" placeholder="Val VN" class="form-control" style="margin-bottom:5px">
+                            <input type="text" id="r-p1vEn" placeholder="Val EN" class="form-control">
+                        </div>
+                        <div>
+                            <label>Thuộc tính 2 (Dẻo)</label>
+                            <input type="text" id="r-p2lVi" placeholder="Label VN" class="form-control" style="margin-bottom:5px">
+                            <input type="text" id="r-p2lEn" placeholder="Label EN" class="form-control" style="margin-bottom:5px">
+                            <input type="text" id="r-p2vVi" placeholder="Val VN" class="form-control" style="margin-bottom:5px">
+                            <input type="text" id="r-p2vEn" placeholder="Val EN" class="form-control">
+                        </div>
+                        <div>
+                            <label>Thuộc tính 3 (Co)</label>
+                            <input type="text" id="r-p3lVi" placeholder="Label VN" class="form-control" style="margin-bottom:5px">
+                            <input type="text" id="r-p3lEn" placeholder="Label EN" class="form-control" style="margin-bottom:5px">
+                            <input type="text" id="r-p3vVi" placeholder="Val VN" class="form-control" style="margin-bottom:5px">
+                            <input type="text" id="r-p3vEn" placeholder="Val EN" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label>Lời khuyên VN *</label><textarea id="r-advVi" class="form-control" rows="2" required></textarea>
+                        <br><label>Lời khuyên EN *</label><textarea id="r-advEn" class="form-control" rows="2" required></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                        <label><input type="checkbox" id="r-featured"> Sản phẩm Nổi Bật</label>
+                        <label><input type="checkbox" id="r-active" checked> Đang bán (Hiển thị)</label>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="width:100%; padding: 12px; font-size: 1.1rem;">Lưu Sản Phẩm</button>
+                </form>
+            </div>
         </div>
     </div>
 

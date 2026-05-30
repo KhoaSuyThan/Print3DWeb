@@ -83,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     loadAnalytics();
                 } else if (target === 'quotes' || target === 'distributors') {
                     loadData(target);
+                } else if (target === 'resins') {
+                    loadResins();
                 }
             });
         });
@@ -274,4 +276,167 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // --- RESINS CMS ---
+    const resinModal = document.getElementById('resin-modal');
+    const closeBtn = document.querySelector('.close-modal');
+    const addResinBtn = document.getElementById('add-resin-btn');
+    const resinForm = document.getElementById('resin-form');
+    
+    if (addResinBtn) {
+        addResinBtn.addEventListener('click', () => {
+            resinForm.reset();
+            document.getElementById('r-id').value = '';
+            document.getElementById('resin-modal-title').textContent = 'Thêm Sản Phẩm Mới';
+            resinModal.classList.add('active');
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            resinModal.classList.remove('active');
+        });
+    }
+
+    window.addEventListener('click', (e) => {
+        if (e.target === resinModal) resinModal.classList.remove('active');
+    });
+
+    async function loadResins() {
+        const tbody = document.querySelector('#resins-table tbody');
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">Đang tải...</td></tr>';
+        try {
+            const res = await fetch(`${API_BASE}/admin/resins`);
+            if (res.status === 401 || res.status === 403) return;
+            const data = await res.json();
+            
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.Id}</td>
+                    <td><b>${item.Code}</b></td>
+                    <td>${item.Name}</td>
+                    <td>${item.IsActive ? '<span style="color:var(--green)">Có</span>' : '<span style="color:var(--red)">Không</span>'}</td>
+                    <td>${item.IsFeatured ? 'Nổi bật' : '-'}</td>
+                    <td>
+                        <button class="btn-outline edit-btn" style="padding:4px 8px; font-size:12px; border-color:var(--primary); color:white">Sửa</button>
+                        <button class="btn-outline del-btn" style="padding:4px 8px; font-size:12px; border-color:var(--red); color:white">Xóa</button>
+                    </td>
+                `;
+                
+                // Edit Event
+                tr.querySelector('.edit-btn').addEventListener('click', () => {
+                    document.getElementById('r-id').value = item.Id;
+                    document.getElementById('r-code').value = item.Code;
+                    document.getElementById('r-name').value = item.Name;
+                    document.getElementById('r-badgeColor').value = item.BadgeColor || '';
+                    document.getElementById('r-image').value = item.ImageUrl || '';
+                    document.getElementById('r-badgeVi').value = item.BadgeTextVi || '';
+                    document.getElementById('r-badgeEn').value = item.BadgeTextEn || '';
+                    document.getElementById('r-baseExp').value = item.BaseExposure;
+                    document.getElementById('r-density').value = item.Density;
+                    document.getElementById('r-statExp').value = item.StatExposureText || '';
+                    document.getElementById('r-statWidth').value = item.StatBarWidth || '';
+                    document.getElementById('r-stabVi').value = item.StabilityVi;
+                    document.getElementById('r-stabEn').value = item.StabilityEn;
+                    document.getElementById('r-descVi').value = item.DescriptionVi || '';
+                    document.getElementById('r-descEn').value = item.DescriptionEn || '';
+                    
+                    document.getElementById('r-p1lVi').value = item.Prop1LabelVi || '';
+                    document.getElementById('r-p1lEn').value = item.Prop1LabelEn || '';
+                    document.getElementById('r-p1vVi').value = item.Prop1ValueVi || '';
+                    document.getElementById('r-p1vEn').value = item.Prop1ValueEn || '';
+                    
+                    document.getElementById('r-p2lVi').value = item.Prop2LabelVi || '';
+                    document.getElementById('r-p2lEn').value = item.Prop2LabelEn || '';
+                    document.getElementById('r-p2vVi').value = item.Prop2ValueVi || '';
+                    document.getElementById('r-p2vEn').value = item.Prop2ValueEn || '';
+                    
+                    document.getElementById('r-p3lVi').value = item.Prop3LabelVi || '';
+                    document.getElementById('r-p3lEn').value = item.Prop3LabelEn || '';
+                    document.getElementById('r-p3vVi').value = item.Prop3ValueVi || '';
+                    document.getElementById('r-p3vEn').value = item.Prop3ValueEn || '';
+                    
+                    document.getElementById('r-advVi').value = item.AdviceVi || '';
+                    document.getElementById('r-advEn').value = item.AdviceEn || '';
+                    
+                    document.getElementById('r-featured').checked = item.IsFeatured;
+                    document.getElementById('r-active').checked = item.IsActive;
+                    
+                    document.getElementById('resin-modal-title').textContent = 'Sửa Sản Phẩm';
+                    resinModal.classList.add('active');
+                });
+                
+                // Delete Event
+                tr.querySelector('.del-btn').addEventListener('click', async () => {
+                    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+                        await fetch(`${API_BASE}/admin/resins/${item.Id}`, { method: 'DELETE' });
+                        loadResins();
+                    }
+                });
+                
+                tbody.appendChild(tr);
+            });
+        } catch (err) {}
+    }
+
+    if (resinForm) {
+        resinForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('r-id').value;
+            const payload = {
+                Code: document.getElementById('r-code').value,
+                Name: document.getElementById('r-name').value,
+                BadgeColor: document.getElementById('r-badgeColor').value,
+                ImageUrl: document.getElementById('r-image').value,
+                BadgeTextVi: document.getElementById('r-badgeVi').value,
+                BadgeTextEn: document.getElementById('r-badgeEn').value,
+                BaseExposure: document.getElementById('r-baseExp').value,
+                Density: document.getElementById('r-density').value,
+                StatExposureText: document.getElementById('r-statExp').value,
+                StatBarWidth: document.getElementById('r-statWidth').value || 0,
+                StabilityVi: document.getElementById('r-stabVi').value,
+                StabilityEn: document.getElementById('r-stabEn').value,
+                DescriptionVi: document.getElementById('r-descVi').value,
+                DescriptionEn: document.getElementById('r-descEn').value,
+                Prop1LabelVi: document.getElementById('r-p1lVi').value,
+                Prop1LabelEn: document.getElementById('r-p1lEn').value,
+                Prop1ValueVi: document.getElementById('r-p1vVi').value,
+                Prop1ValueEn: document.getElementById('r-p1vEn').value,
+                Prop2LabelVi: document.getElementById('r-p2lVi').value,
+                Prop2LabelEn: document.getElementById('r-p2lEn').value,
+                Prop2ValueVi: document.getElementById('r-p2vVi').value,
+                Prop2ValueEn: document.getElementById('r-p2vEn').value,
+                Prop3LabelVi: document.getElementById('r-p3lVi').value,
+                Prop3LabelEn: document.getElementById('r-p3lEn').value,
+                Prop3ValueVi: document.getElementById('r-p3vVi').value,
+                Prop3ValueEn: document.getElementById('r-p3vEn').value,
+                AdviceVi: document.getElementById('r-advVi').value,
+                AdviceEn: document.getElementById('r-advEn').value,
+                IsFeatured: document.getElementById('r-featured').checked ? 1 : 0,
+                IsActive: document.getElementById('r-active').checked ? 1 : 0
+            };
+            
+            const url = id ? `${API_BASE}/admin/resins/${id}` : `${API_BASE}/admin/resins`;
+            const method = id ? 'PUT' : 'POST';
+            
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    resinModal.classList.remove('active');
+                    loadResins();
+                } else {
+                    alert('Lỗi lưu sản phẩm');
+                }
+            } catch (err) {
+                alert('Lỗi kết nối máy chủ');
+            }
+        });
+    }
+
 });
