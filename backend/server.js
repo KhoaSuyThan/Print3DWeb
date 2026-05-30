@@ -8,6 +8,9 @@ const { body, validationResult } = require('express-validator');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 
+const { Groq } = require('groq-sdk');
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -186,6 +189,112 @@ const verifyToken = (req, res, next) => {
         next();
     });
 };
+
+// 5.5. AI Chatbot (Groq API)
+app.post('/api/chat', async (req, res) => {
+    try {
+        const userMessage = req.body.message;
+        const chatHistory = req.body.history || [];
+
+        let pool = await sql.connect(dbConfig);
+        
+        // 1. Lấy cấu hình AI từ DB
+        let aiConfigResult = await pool.request().query('SELECT TOP 1 * FROM AiConfig ORDER BY Id DESC');
+        if (aiConfigResult.recordset.length === 0) {
+            return res.status(500).json({ error: 'Chưa cấu hình AI' });
+        }
+        const aiConfig = aiConfigResult.recordset[0];
+        
+        if (!aiConfig.GroqApiKey) {
+            return res.status(500).json({ error: 'Thiếu API Key cho AI' });
+        }
+
+        // Khởi tạo lại Groq client với Key từ DB
+        const dynamicGroq = new Groq({ apiKey: aiConfig.GroqApiKey });
+
+        // 2. Lấy thông tin resins từ database để làm ngữ cảnh
+        let result = await pool.request().query('SELECT * FROM Resins WHERE IsActive = 1');
+        const resinsData = result.recordset;
+
+        let contextInfo = "Bạn là trợ lý ảo AI chuyên nghiệp của RightChoiceVN, chuyên tư vấn về nhựa in 3D.\n";
+        contextInfo += "Dưới đây là thông số các loại nhựa hiện có (Lấy từ Database của chúng tôi):\n\n";
+        
+        resinsData.forEach(r => {
+            contextInfo += `- Dòng sản phẩm: ${r.Name}:\n`;
+            contextInfo += `  + Ứng dụng/Mô tả: ${r.DescriptionVi}\n`;
+            contextInfo += `  + Thời gian phơi sáng khuyên dùng: ${r.StatExposureText} (Base Exposure: ${r.BaseExposure})\n`;
+            contextInfo += `  + Tỉ trọng (Density): ${r.Density}\n`;
+            contextInfo += `  + Đặc tính cơ lý: ${r.Prop1LabelVi}: ${r.Prop1ValueVi}, ${r.Prop2LabelVi}: ${r.Prop2ValueVi}, ${r.Prop3LabelVi}: ${r.Prop3ValueVi}\n`;
+            contextInfo += `  + Lời khuyên kỹ thuật: ${r.AdviceVi}\n\n`;
+        });
+
+        // 3. Gắn luật Prompt từ DB
+        contextInfo += aiConfig.SystemPromptRules || "";
+
+        const messages = [
+            { role: "system", content: contextInfo },
+            ...chatHistory,
+            { role: "user", content: userMessage }
+        ];
+
+        const completion = await dynamicGroq.chat.completions.create({
+            messages: messages,
+            model: aiConfig.ModelName || "llama-3.1-8b-instant",
+            temperature: 0.5,
+            max_tokens: 1024,
+        });
+
+        const reply = completion.choices[0]?.message?.content || "Xin lỗi, tôi đang gặp lỗi kết nối với trung tâm dữ liệu.";
+        res.json({ reply });
+
+    } catch (err) {
+        console.error('Chatbot API Error:', err);
+        res.status(500).json({ error: 'Chatbot service unavailable.' });
+    }
+});
+
+// 5.6. Quản lý cấu hình AI (Yêu cầu Admin)
+app.get('/api/admin/ai-config', verifyToken, async (req, res) => {
+    try {
+        let pool = await sql.connect(dbConfig);
+        let result = await pool.request().query('SELECT TOP 1 * FROM AiConfig ORDER BY Id DESC');
+        if (result.recordset.length > 0) {
+            res.json(result.recordset[0]);
+        } else {
+            res.json(null);
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Lỗi lấy cấu hình AI' });
+    }
+});
+
+app.put('/api/admin/ai-config', verifyToken, async (req, res) => {
+    try {
+        let pool = await sql.connect(dbConfig);
+        await pool.request()
+            .input('GroqApiKey', sql.NVarChar(255), req.body.GroqApiKey)
+            .input('ModelName', sql.NVarChar(100), req.body.ModelName)
+            .input('SystemPromptRules', sql.NVarChar(sql.MAX), req.body.SystemPromptRules)
+            .query(`
+                IF EXISTS (SELECT * FROM AiConfig)
+                BEGIN
+                    UPDATE AiConfig SET 
+                        GroqApiKey = @GroqApiKey,
+                        ModelName = @ModelName,
+                        SystemPromptRules = @SystemPromptRules
+                END
+                ELSE
+                BEGIN
+                    INSERT INTO AiConfig (GroqApiKey, ModelName, SystemPromptRules)
+                    VALUES (@GroqApiKey, @ModelName, @SystemPromptRules)
+                END
+            `);
+        res.json({ message: 'Lưu cấu hình AI thành công' });
+    } catch (err) {
+        console.error('Update AiConfig Error:', err);
+        res.status(500).json({ error: 'Lỗi cập nhật cấu hình AI' });
+    }
+});
 
 // 6. Lấy danh sách báo giá (Yêu cầu Admin)
 app.get('/api/admin/quotes', verifyToken, async (req, res) => {

@@ -653,6 +653,46 @@
         </svg>
     </button>
 
+    <!-- AI Chatbot UI -->
+    <div id="chatbot-container" class="chatbot-container">
+        <!-- Chatbot Window -->
+        <div id="chatbot-window" class="chatbot-window hidden glass">
+            <div class="chatbot-header">
+                <div class="chatbot-title">
+                    <span class="bot-icon">🤖</span>
+                    <div>
+                        <h4 style="margin:0; font-family: 'Outfit'; font-size: 1rem;">Trợ Lý In 3D</h4>
+                        <span style="font-size: 0.75rem; color: var(--primary); display: flex; align-items: center; gap: 4px;"><span class="tag-pulse" style="width:6px; height:6px;"></span> Online 24/7</span>
+                    </div>
+                </div>
+                <button id="chatbot-close-btn" class="chatbot-close-btn">&times;</button>
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages">
+                <!-- Messages will appear here -->
+                <div class="chat-message bot-message">
+                    <div class="msg-avatar">🤖</div>
+                    <div class="msg-bubble">Xin chào! Tôi là trợ lý AI của RightChoiceVN. Bạn cần tư vấn chọn dòng nhựa nào hay thông số in bao nhiêu không?</div>
+                </div>
+            </div>
+            <div class="chatbot-input-area">
+                <input type="text" id="chatbot-input" placeholder="Nhập câu hỏi của bạn..." autocomplete="off">
+                <button id="chatbot-send-btn" aria-label="Gửi tin nhắn">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chatbot Trigger Button -->
+        <button id="chatbot-trigger" class="chatbot-trigger" aria-label="Mở Trợ lý AI">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+        </button>
+    </div>
+
     <!-- Toast Notification Container -->
     <div id="toast-container" class="toast-container"></div>
 

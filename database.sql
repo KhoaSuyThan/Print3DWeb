@@ -101,3 +101,20 @@ CREATE TABLE CalculatorLogs (
     CreatedAt DATETIME DEFAULT GETDATE()
 );
 GO
+  
+-- 6. B?ng c?u hçnh AI (AiConfig)  
+CREATE TABLE AiConfig (  
+    Id INT IDENTITY(1,1) PRIMARY KEY,  
+    GroqApiKey NVARCHAR(255) NULL,  
+    ModelName NVARCHAR(100) DEFAULT 'llama-3.1-8b-instant',  
+    SystemPromptRules NVARCHAR(MAX) NULL  
+);  
+GO  
+  
+INSERT INTO AiConfig (GroqApiKey, ModelName, SystemPromptRules)  
+VALUES (  
+    '',  
+    'llama-3.1-8b-instant',  
+    N'Quy t?c tr? l?i:\n1. LUON tr? l?i ng?n g?n, l?ch s?, d£ng tr?ng tÉm cÉu h?i. Khìng gi?i th°ch dìng dÖi.\n2. N?U KHACH H?I B?NG TI?NG ANH, HAY TR? L?I B?NG TI?NG ANH. N?u h?i Ti?ng Vi?t thç tr? l?i Ti?ng Vi?t.\n3. CH? tu v?n d?a tràn thìng s? c†c lo?i nh?a du?c cung c?p ? tràn.\n4. N?u kh†ch h?i thìng tin ngoÖi lu?ng, hay khÇo lÇo t? ch?i vÖ hu?ng h? v? s?n ph?m RightChoiceVN.'  
+);  
+GO 

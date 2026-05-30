@@ -85,6 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     loadData(target);
                 } else if (target === 'resins') {
                     loadResins();
+                } else if (target === 'ai-config') {
+                    loadAiConfig();
                 }
             });
         });
@@ -435,6 +437,74 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (err) {
                 alert('Lỗi kết nối máy chủ');
+            }
+        });
+    }
+
+    // --- AI CONFIG MANAGEMENT ---  
+    async function loadAiConfig() {  
+        try {  
+            const res = await fetch(`${API_BASE}/admin/ai-config`);  
+            if (!res.ok) return;  
+            const data = await res.json();  
+            if (data) {  
+                document.getElementById('ai-api-key').value = data.GroqApiKey || '';
+                document.getElementById('ai-model-name').value = data.ModelName || 'llama-3.1-8b-instant';
+                document.getElementById('ai-prompt-rules').value = data.SystemPromptRules || '';
+            }  
+        } catch (err) {  
+            console.error('Error loading AI config:', err);  
+        }  
+    }  
+
+    const aiConfigForm = document.getElementById('ai-config-form');  
+    if (aiConfigForm) {  
+        aiConfigForm.addEventListener('submit', async (e) => {  
+            e.preventDefault();  
+            const submitBtn = document.getElementById('save-ai-config-btn');  
+            const originalText = submitBtn.innerHTML;  
+            submitBtn.innerHTML = 'Đang lưu...';  
+            submitBtn.disabled = true;  
+
+            const aiData = {  
+                GroqApiKey: document.getElementById('ai-api-key').value,  
+                ModelName: document.getElementById('ai-model-name').value,  
+                SystemPromptRules: document.getElementById('ai-prompt-rules').value  
+            };  
+
+            try {  
+                const res = await fetch(`${API_BASE}/admin/ai-config`, {  
+                    method: 'PUT',  
+                    headers: { 'Content-Type': 'application/json' },  
+                    body: JSON.stringify(aiData)  
+                });  
+
+                if (res.ok) {  
+                    alert('Lưu cấu hình AI thành công!');  
+                } else {  
+                    alert('Có lỗi xảy ra khi lưu cấu hình.');  
+                }  
+            } catch (err) {  
+                alert('Lỗi kết nối máy chủ.');  
+            } finally {  
+                submitBtn.innerHTML = originalText;  
+                submitBtn.disabled = false;  
+            }  
+        });  
+    }  
+    const toggleApiKeyBtn = document.getElementById('toggle-api-key-btn');
+    if (toggleApiKeyBtn) {
+        toggleApiKeyBtn.addEventListener('click', () => {
+            const apiKeyInput = document.getElementById('ai-api-key');
+            const icon = toggleApiKeyBtn.querySelector('i');
+            if (apiKeyInput.type === 'password') {
+                apiKeyInput.type = 'text';
+                icon.classList.remove('ph-eye');
+                icon.classList.add('ph-eye-slash');
+            } else {
+                apiKeyInput.type = 'password';
+                icon.classList.remove('ph-eye-slash');
+                icon.classList.add('ph-eye');
             }
         });
     }

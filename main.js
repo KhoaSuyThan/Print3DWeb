@@ -964,4 +964,111 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Language settings
     setLanguage(currentLang);
 
+    // ==========================================
+    // AI Chatbot Logic
+    // ==========================================
+    const chatbotTrigger = document.getElementById('chatbot-trigger');
+    const chatbotWindow = document.getElementById('chatbot-window');
+    const chatbotClose = document.getElementById('chatbot-close-btn');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotSendBtn = document.getElementById('chatbot-send-btn');
+    const chatbotMessages = document.getElementById('chatbot-messages');
+    
+    let chatHistory = [];
+
+    // Toggle Window
+    if(chatbotTrigger && chatbotWindow && chatbotClose) {
+        chatbotTrigger.addEventListener('click', () => {
+            chatbotWindow.classList.toggle('hidden');
+            if(!chatbotWindow.classList.contains('hidden')) {
+                chatbotInput.focus();
+            }
+        });
+
+        chatbotClose.addEventListener('click', () => {
+            chatbotWindow.classList.add('hidden');
+        });
+    }
+
+    // Send Message
+    async function sendMessage() {
+        const text = chatbotInput.value.trim();
+        if(!text) return;
+
+        // Add user message to UI
+        appendMessage('user', text);
+        chatbotInput.value = '';
+        
+        // Add loading indicator
+        const loadingId = 'loading-' + Date.now();
+        appendMessage('bot', '...', loadingId);
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    message: text,
+                    history: chatHistory 
+                })
+            });
+
+            const data = await response.json();
+            
+            // Remove loading
+            document.getElementById(loadingId)?.remove();
+
+            if(response.ok && data.reply) {
+                appendMessage('bot', data.reply);
+                
+                // Update history (keep last 6 messages to save context limit)
+                chatHistory.push({ role: 'user', content: text });
+                chatHistory.push({ role: 'assistant', content: data.reply });
+                if(chatHistory.length > 6) {
+                    chatHistory = chatHistory.slice(chatHistory.length - 6);
+                }
+            } else {
+                appendMessage('bot', 'Xin lỗi, tôi đang bận. Vui lòng thử lại sau nhé.');
+            }
+        } catch (err) {
+            console.error(err);
+            document.getElementById(loadingId)?.remove();
+            appendMessage('bot', 'Lỗi kết nối. Vui lòng kiểm tra mạng.');
+        }
+    }
+
+    function appendMessage(role, text, id = null) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `chat-message ${role}-message`;
+        if(id) msgDiv.id = id;
+        
+        if (role === 'bot') {
+            msgDiv.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-bubble">${escapeHTML(text).replace(/\n/g, '<br>')}</div>`;
+        } else {
+            msgDiv.innerHTML = `<div class="msg-bubble">${escapeHTML(text)}</div>`;
+        }
+        
+        chatbotMessages.appendChild(msgDiv);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag])
+        );
+    }
+
+    if(chatbotSendBtn && chatbotInput) {
+        chatbotSendBtn.addEventListener('click', sendMessage);
+        chatbotInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') sendMessage();
+        });
+    }
+
 });

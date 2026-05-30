@@ -177,13 +177,44 @@
                     </div>
                 </div>
 
-                <!-- Tab AI Config (Coming Soon) -->
+                <!-- Tab AI Config -->
                 <div id="tab-ai-config" class="tab-content">
-                    <h2><i class="ph ph-robot"></i> Quản lý AI</h2>
-                    <div class="chart-card" style="text-align: center; padding: 60px 20px;">
-                        <i class="ph ph-hammer" style="font-size: 4rem; color: var(--primary); margin-bottom: 20px; display: inline-block;"></i>
-                        <h3 style="color: var(--text-main); font-size: 1.5rem; margin-bottom: 10px;">Tính năng đang được phát triển</h3>
-                        <p style="color: var(--text-muted);">Giao diện quản lý và cấu hình trí tuệ nhân tạo sẽ sớm ra mắt trong các phiên bản cập nhật tới.</p>
+                    <h2><i class="ph ph-robot"></i> Quản lý Cấu hình AI</h2>
+                    <div class="chart-card" style="padding: 30px; margin-top: 20px;">
+                        <form id="ai-config-form">
+                            <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Groq API Key *</label>
+                                    <div style="position: relative;">
+                                        <input type="password" id="ai-api-key" class="form-control" placeholder="Nhập Groq API Key..." required style="width: 100%; padding-right: 40px;">
+                                        <button type="button" id="toggle-api-key-btn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;">
+                                            <i class="ph ph-eye"></i>
+                                        </button>
+                                    </div>
+                                    <small style="color: var(--text-muted);">Khóa bí mật dùng để kết nối với trung tâm dữ liệu AI của Groq.</small>
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tên Model *</label>
+                                    <select id="ai-model-name" class="form-control" required style="width: 100%;">
+                                        <option value="llama-3.1-8b-instant">Llama 3.1 8B (Nhanh - Mặc định)</option>
+                                        <option value="llama-3.1-70b-versatile">Llama 3.1 70B (Thông minh cao cấp)</option>
+                                        <option value="mixtral-8x7b-32768">Mixtral 8x7B (Cân bằng)</option>
+                                        <option value="gemma2-9b-it">Gemma 2 9B (Google)</option>
+                                    </select>
+                                    <small style="color: var(--text-muted);">Phiên bản trí tuệ nhân tạo sẽ sử dụng để tư vấn.</small>
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Quy tắc trả lời (System Prompt) *</label>
+                                    <textarea id="ai-prompt-rules" class="form-control" rows="10" placeholder="Định hình tính cách và quy định cho Chatbot..." required style="width: 100%; font-family: monospace;"></textarea>
+                                    <small style="color: var(--text-muted);">Nhập các nội quy, ví dụ: 1. Xưng hô lịch sự. 2. Không nói chuyện ngoài luồng.</small>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <button type="submit" class="btn-primary" id="save-ai-config-btn" style="padding: 12px 24px;">
+                                    <i class="ph ph-floppy-disk"></i> Lưu Cấu Hình
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 

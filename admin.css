@@ -523,6 +523,10 @@ tr:hover td {
     border-radius: 4px;
     font-family: inherit;
 }
+.form-control option {
+    background: var(--bg-dark);
+    color: white;
+}
 .form-control:focus { outline: none; border-color: var(--primary); }
 .modal-body { overflow-y: auto; padding-right: 10px; }
 .modal-body::-webkit-scrollbar { width: 6px; }
