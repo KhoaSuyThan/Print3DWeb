@@ -806,7 +806,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast(t["toast.quoteSuccessTitle"], successMsg, 'success');
                     quoteForm.reset();
                 } else {
-                    showToast('Lỗi / Error', 'Không thể gửi yêu cầu. / Cannot submit request.', 'error');
+                    let errMsg = 'Không thể gửi yêu cầu. / Cannot submit request.';
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.error) errMsg = errorData.error;
+                    } catch (e) {}
+                    showToast('Lỗi / Error', errMsg, 'error');
                 }
             } catch (err) {
                 console.error(err);
@@ -850,7 +855,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast(t["toast.distSuccessTitle"], successMsg, 'success');
                     distributorForm.reset();
                 } else {
-                    showToast('Lỗi / Error', 'Không thể gửi đăng ký. / Cannot submit application.', 'error');
+                    let errMsg = 'Không thể gửi đăng ký. / Cannot submit application.';
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.error) errMsg = errorData.error;
+                    } catch (e) {}
+                    showToast('Lỗi / Error', errMsg, 'error');
                 }
             } catch (err) {
                 console.error(err);

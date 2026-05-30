@@ -4,10 +4,21 @@ const express = require('express');
 const cors = require('cors');
 const sql = require('mssql/msnodesqlv8');
 const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
+const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
+
+// Rate limit config: 5 requests per hour per IP for forms
+const formLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5,
+    message: { error: 'Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau 1 giờ.' }
+});
 
 // Phục vụ các file tĩnh (Frontend) từ thư mục gốc
 app.use(express.static(path.join(__dirname, '..')));
@@ -34,7 +45,15 @@ app.get('/api/resins', async (req, res) => {
 });
 
 // 2. Gửi yêu cầu báo giá
-app.post('/api/quote-requests', async (req, res) => {
+app.post('/api/quote-requests', formLimiter, [
+    body('fullName').notEmpty().withMessage('Họ tên không được để trống'),
+    body('email').isEmail().withMessage('Email không hợp lệ'),
+    body('phone').isNumeric().withMessage('Số điện thoại không hợp lệ').isLength({ min: 8, max: 15 }).withMessage('Số điện thoại phải từ 8-15 số')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ error: errors.array()[0].msg });
+    }
     const { fullName, email, phone, resin, message } = req.body;
     try {
         let pool = await sql.connect(dbConfig);
@@ -56,7 +75,16 @@ app.post('/api/quote-requests', async (req, res) => {
 });
 
 // 3. Đăng ký đại lý
-app.post('/api/distributors', async (req, res) => {
+app.post('/api/distributors', formLimiter, [
+    body('companyName').notEmpty().withMessage('Tên công ty không được để trống'),
+    body('contactPerson').notEmpty().withMessage('Người liên hệ không được để trống'),
+    body('zaloPhone').isNumeric().withMessage('Số Zalo không hợp lệ').isLength({ min: 8, max: 15 }).withMessage('Số Zalo phải từ 8-15 số'),
+    body('city').notEmpty().withMessage('Tỉnh/Thành phố không được để trống')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ error: errors.array()[0].msg });
+    }
     const { companyName, contactPerson, zaloPhone, city, estimatedVolume } = req.body;
     try {
         let pool = await sql.connect(dbConfig);
@@ -114,7 +142,12 @@ app.post('/api/admin/login', async (req, res) => {
                 process.env.JWT_SECRET || 'secret123', 
                 { expiresIn: '1d' }
             );
-            res.json({ token, user: { username: user.Username, role: user.Role } });
+            res.cookie('adminToken', token, { 
+                httpOnly: true, 
+                secure: process.env.NODE_ENV === 'production', 
+                maxAge: 24 * 60 * 60 * 1000 
+            });
+            res.json({ user: { username: user.Username, role: user.Role } });
         } else {
             res.status(401).json({ error: 'Sai tài khoản hoặc mật khẩu' });
         }
@@ -124,10 +157,26 @@ app.post('/api/admin/login', async (req, res) => {
     }
 });
 
+// Kiểm tra trạng thái đăng nhập
+app.get('/api/admin/me', (req, res) => {
+    const token = req.cookies.adminToken;
+    if (!token) return res.status(401).json({ error: 'Chưa đăng nhập' });
+    
+    jwt.verify(token, process.env.JWT_SECRET || 'secret123', (err, decoded) => {
+        if (err) return res.status(401).json({ error: 'Token không hợp lệ' });
+        res.json({ user: { username: decoded.username, role: decoded.role } });
+    });
+});
+
+// Đăng xuất
+app.post('/api/admin/logout', (req, res) => {
+    res.clearCookie('adminToken');
+    res.json({ message: 'Đã đăng xuất' });
+});
+
 // Middleware xác thực JWT
 const verifyToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = req.cookies.adminToken;
     
     if (!token) return res.status(403).json({ error: 'Yêu cầu đăng nhập' });
     

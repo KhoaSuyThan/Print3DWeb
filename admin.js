@@ -6,14 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const dashboardScreen = document.getElementById('dashboard-screen');
     
     // Auth Check
-    let token = localStorage.getItem('adminToken');
     let currentUser = localStorage.getItem('adminUser');
     
-    if (token) {
-        showDashboard();
-    } else {
-        loginScreen.classList.add('active');
-    }
+    // Check login via API (Cookie)
+    fetch(`${API_BASE}/admin/me`)
+        .then(res => {
+            if (res.ok) return res.json();
+            throw new Error('Chưa đăng nhập');
+        })
+        .then(data => {
+            currentUser = data.user.username;
+            localStorage.setItem('adminUser', currentUser);
+            showDashboard();
+        })
+        .catch(() => {
+            loginScreen.classList.add('active');
+        });
 
     // --- LOGIN ---
     const loginForm = document.getElementById('login-form');
@@ -33,9 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             
             if (res.ok) {
-                token = data.token;
                 currentUser = data.user.username;
-                localStorage.setItem('adminToken', token);
                 localStorage.setItem('adminUser', currentUser);
                 showDashboard();
             } else {
@@ -47,10 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- LOGOUT ---
-    document.getElementById('logout-btn').addEventListener('click', () => {
-        localStorage.removeItem('adminToken');
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+        await fetch(`${API_BASE}/admin/logout`, { method: 'POST' });
         localStorage.removeItem('adminUser');
-        token = null;
         dashboardScreen.classList.remove('active');
         loginScreen.classList.add('active');
     });
@@ -95,9 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '<tr><td colspan="10" style="text-align:center">Đang tải dữ liệu...</td></tr>';
         
         try {
-            const res = await fetch(url, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const res = await fetch(url);
             
             if (res.status === 401 || res.status === 403) {
                 alert('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
@@ -154,9 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadAnalytics() {
         try {
-            const res = await fetch(`${API_BASE}/admin/analytics`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const res = await fetch(`${API_BASE}/admin/analytics`);
             if (!res.ok) return;
             const data = await res.json();
             
