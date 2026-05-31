@@ -990,10 +990,73 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Quick Replies Logic
+    const quickReplyBtns = document.querySelectorAll('.quick-reply-btn');
+    const quickRepliesContainer = document.getElementById('quick-replies-container');
+    
+    if (quickReplyBtns.length > 0) {
+        quickReplyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const questionText = btn.textContent;
+                const answerText = btn.getAttribute('data-reply');
+                
+                // Ẩn quick replies container lập tức
+                if (quickRepliesContainer) {
+                    quickRepliesContainer.style.opacity = '0';
+                    quickRepliesContainer.style.pointerEvents = 'none';
+                    setTimeout(() => {
+                        quickRepliesContainer.style.display = 'none';
+                    }, 200);
+                }
+
+                // Add user message
+                appendMessage('user', questionText);
+                
+                // Add loading indicator
+                const loadingId = 'loading-' + Date.now();
+                appendMessage('bot', '...', loadingId);
+
+                // Delay ngắn để giả lập typing
+                setTimeout(() => {
+                    document.getElementById(loadingId)?.remove();
+                    appendMessage('bot', answerText);
+                    
+                    // Add to chat history context
+                    chatHistory.push({ role: 'user', content: questionText });
+                    chatHistory.push({ role: 'assistant', content: answerText });
+
+                    // 3s sau từ từ hiện lại ở dưới cùng
+                    setTimeout(() => {
+                        if (quickRepliesContainer) {
+                            // Dời thẻ này xuống cuối cùng của khung chat
+                            const messagesContainer = document.getElementById('chatbot-messages');
+                            if (messagesContainer) {
+                                messagesContainer.appendChild(quickRepliesContainer);
+                            }
+                            
+                            quickRepliesContainer.style.display = ''; // Trả về display gốc (grid) trong CSS
+                            void quickRepliesContainer.offsetWidth; // force reflow
+                            quickRepliesContainer.style.opacity = '1';
+                            quickRepliesContainer.style.pointerEvents = 'auto';
+                            
+                            // Cuộn xuống dưới
+                            if (messagesContainer) {
+                                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                            }
+                        }
+                    }, 3000);
+                }, 600);
+            });
+        });
+    }
+
     // Send Message
     async function sendMessage() {
         const text = chatbotInput.value.trim();
         if(!text) return;
+
+        // Ẩn quick replies khi người dùng tự gõ
+        if (quickRepliesContainer) quickRepliesContainer.style.display = 'none';
 
         // Add user message to UI
         appendMessage('user', text);
