@@ -14,7 +14,7 @@
 <body>
 
     <!-- Màn hình Đăng nhập -->
-    <div id="login-screen" class="screen active">
+    <div id="login-screen" class="screen">
         <div class="login-wrapper">
             <div class="glow-orb"></div>
             <div class="login-card">
@@ -35,7 +35,8 @@
                         <label>Mật khẩu</label>
                         <div class="input-wrapper">
                             <i class="ph ph-lock-key"></i>
-                            <input type="password" id="password" required placeholder="Nhập mật khẩu">
+                            <input type="password" id="password" required placeholder="Nhập mật khẩu" style="padding-right: 44px;">
+                            <i class="ph ph-eye" id="toggle-password-btn" style="left: auto; right: 16px; cursor: pointer; z-index: 10;"></i>
                         </div>
                     </div>
                     <div id="login-error" class="error-msg"></div>
@@ -139,12 +140,12 @@
                         <table id="quotes-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Ngày tạo</th>
-                                    <th>Khách hàng</th>
-                                    <th>Liên hệ</th>
-                                    <th>Nhựa quan tâm</th>
-                                    <th>Lời nhắn</th>
+                                    <th style="width: 8%">ID</th>
+                                    <th style="width: 15%">Ngày tạo</th>
+                                    <th style="width: 22%">Khách hàng</th>
+                                    <th style="width: 15%">Liên hệ</th>
+                                    <th style="width: 15%">Nhựa quan tâm</th>
+                                    <th style="width: 25%">Lời nhắn</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -161,13 +162,13 @@
                         <table id="distributors-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Ngày tạo</th>
-                                    <th>Công ty</th>
-                                    <th>Người liên hệ</th>
-                                    <th>Zalo</th>
-                                    <th>Thành phố</th>
-                                    <th>Sản lượng dự kiến</th>
+                                    <th style="width: 6%">ID</th>
+                                    <th style="width: 14%">Ngày tạo</th>
+                                    <th style="width: 20%">Công ty</th>
+                                    <th style="width: 16%">Người liên hệ</th>
+                                    <th style="width: 14%">Zalo</th>
+                                    <th style="width: 12%">Thành phố</th>
+                                    <th style="width: 18%">Sản lượng dự kiến</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -228,12 +229,12 @@
                         <table id="resins-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Code</th>
-                                    <th>Tên Sản Phẩm</th>
-                                    <th>Hiển thị</th>
-                                    <th>Nổi bật</th>
-                                    <th>Thao tác</th>
+                                    <th style="width: 8%">ID</th>
+                                    <th style="width: 15%">Code</th>
+                                    <th style="width: 35%">Tên Sản Phẩm</th>
+                                    <th style="width: 12%">Hiển thị</th>
+                                    <th style="width: 15%">Nổi bật</th>
+                                    <th style="width: 15%">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
