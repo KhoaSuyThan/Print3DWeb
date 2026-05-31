@@ -27,6 +27,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
 
+    const togglePasswordBtn = document.getElementById('toggle-password-btn');
+    const passwordInput = document.getElementById('password');
+    if (togglePasswordBtn && passwordInput) {
+        togglePasswordBtn.addEventListener('click', () => {
+            const icon = togglePasswordBtn;
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('ph-eye');
+                icon.classList.add('ph-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('ph-eye-slash');
+                icon.classList.add('ph-eye');
+            }
+        });
+    }
+
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = document.getElementById('username').value;
@@ -78,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 link.classList.add('active');
                 const target = link.getAttribute('data-target');
                 document.getElementById(`tab-${target}`).classList.add('active');
+                localStorage.setItem('rightchoice_admin_active_tab', target);
                 
                 if (target === 'overview') {
                     loadAnalytics();
@@ -92,7 +110,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Tải tab mặc định
-        loadAnalytics();
+        const savedTab = localStorage.getItem('rightchoice_admin_active_tab');
+        if (savedTab) {
+            const savedLink = Array.from(navLinks).find(l => l.getAttribute('data-target') === savedTab);
+            if (savedLink) savedLink.click();
+            else loadAnalytics();
+        } else {
+            loadAnalytics();
+        }
     }
 
     // --- FETCH DATA ---
@@ -322,8 +347,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${item.IsActive ? '<span style="color:var(--green)">Có</span>' : '<span style="color:var(--red)">Không</span>'}</td>
                     <td>${item.IsFeatured ? 'Nổi bật' : '-'}</td>
                     <td>
-                        <button class="btn-outline edit-btn" style="padding:4px 8px; font-size:12px; border-color:var(--primary); color:white">Sửa</button>
-                        <button class="btn-outline del-btn" style="padding:4px 8px; font-size:12px; border-color:var(--red); color:white">Xóa</button>
+                        <button class="btn-outline edit-btn" style="padding:6px 12px; font-size:12px;">Sửa</button>
+                        <button class="btn-outline del-btn" style="padding:6px 12px; font-size:12px;">Xóa</button>
                     </td>
                 `;
                 
