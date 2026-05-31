@@ -1913,3 +1913,37 @@ textarea.form-control {
 #chatbot-send-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #030712; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; transition: var(--transition-fast); }  
 #chatbot-send-btn:hover { background: var(--primary-hover); transform: scale(1.05); }  
 @media (max-width: 480px) { .chatbot-window { width: calc(100vw - 48px); height: 450px; } } 
+
+/* ==========================================================================
+   Chatbot Quick Replies
+   ========================================================================== */
+.quick-replies-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: auto 0 0 0;
+    width: 100%;
+    transition: opacity 0.8s ease;
+}
+.quick-reply-btn {
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+.quick-reply-btn:hover {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+.quick-reply-btn:first-child {
+    grid-column: 1 / -1;
+}
