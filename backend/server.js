@@ -1,5 +1,10 @@
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+if (!process.env.JWT_SECRET) {
+    console.error('CRITICAL ERROR: JWT_SECRET is missing in .env file!');
+    process.exit(1);
+}
 const express = require('express');
 const cors = require('cors');
 const sql = require('mssql/msnodesqlv8');
@@ -21,6 +26,20 @@ const formLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
     max: 5,
     message: { error: 'Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau 1 giờ.' }
+});
+
+// Rate limit config: 10 requests per minute for AI Chatbot
+const chatLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 10,
+    message: { error: 'Bạn đã gửi quá nhiều tin nhắn. Vui lòng chờ 1 phút.' }
+});
+
+// Rate limit config: 5 failed login attempts per 15 minutes
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5,
+    message: { error: 'Đăng nhập sai quá nhiều lần. Vui lòng thử lại sau 15 phút.' }
 });
 
 // Phục vụ các file tĩnh (Frontend) từ thư mục gốc
@@ -129,7 +148,7 @@ app.post('/api/analytics/calculator', async (req, res) => {
 });
 
 // 5. Admin Login
-app.post('/api/admin/login', async (req, res) => {
+app.post('/api/admin/login', loginLimiter, async (req, res) => {
     const { username, password } = req.body;
     try {
         let pool = await sql.connect(dbConfig);
@@ -142,7 +161,7 @@ app.post('/api/admin/login', async (req, res) => {
             const user = result.recordset[0];
             const token = jwt.sign(
                 { id: user.Id, username: user.Username, role: user.Role }, 
-                process.env.JWT_SECRET || 'secret123', 
+                process.env.JWT_SECRET, 
                 { expiresIn: '1d' }
             );
             res.cookie('adminToken', token, { 
@@ -165,7 +184,7 @@ app.get('/api/admin/me', (req, res) => {
     const token = req.cookies.adminToken;
     if (!token) return res.status(401).json({ error: 'Chưa đăng nhập' });
     
-    jwt.verify(token, process.env.JWT_SECRET || 'secret123', (err, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) return res.status(401).json({ error: 'Token không hợp lệ' });
         res.json({ user: { username: decoded.username, role: decoded.role } });
     });
@@ -183,7 +202,7 @@ const verifyToken = (req, res, next) => {
     
     if (!token) return res.status(403).json({ error: 'Yêu cầu đăng nhập' });
     
-    jwt.verify(token, process.env.JWT_SECRET || 'secret123', (err, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) return res.status(401).json({ error: 'Token không hợp lệ hoặc đã hết hạn' });
         req.user = decoded;
         next();
@@ -191,7 +210,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // 5.5. AI Chatbot (Groq API)
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', chatLimiter, async (req, res) => {
     try {
         const userMessage = req.body.message;
         const chatHistory = req.body.history || [];
