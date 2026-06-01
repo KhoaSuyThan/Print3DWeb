@@ -9,7 +9,43 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================================================
-    // 0. Multi-language Translation Engine (i18n)
+    // 0. Theme Switcher (Light / Dark Mode)
+    // ==========================================================================
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const iconSun = themeToggleBtn ? themeToggleBtn.querySelector('.icon-sun') : null;
+    const iconMoon = themeToggleBtn ? themeToggleBtn.querySelector('.icon-moon') : null;
+    
+    // Check saved theme or system preference
+    let currentTheme = localStorage.getItem('theme');
+    if (!currentTheme) {
+        currentTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    }
+    
+    function applyTheme(theme) {
+        if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            if (iconSun) iconSun.style.display = 'block';
+            if (iconMoon) iconMoon.style.display = 'none';
+        } else {
+            document.documentElement.removeAttribute('data-theme'); // default is dark
+            if (iconSun) iconSun.style.display = 'none';
+            if (iconMoon) iconMoon.style.display = 'block';
+        }
+    }
+    
+    // Apply initial theme
+    applyTheme(currentTheme);
+    
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('theme', currentTheme);
+            applyTheme(currentTheme);
+        });
+    }
+
+    // ==========================================================================
+    // 1. Multi-language Translation Engine (i18n)
     // ==========================================================================
     const translations = {
         vi: {
