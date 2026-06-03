@@ -534,4 +534,81 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- CSV EXPORT ---
+    function downloadCSV(csvContent, fileName) {
+        const BOM = "\uFEFF"; // Fix UTF-8 for Excel
+        const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    const exportQuotesBtn = document.getElementById('export-quotes-btn');
+    if (exportQuotesBtn) {
+        exportQuotesBtn.addEventListener('click', async () => {
+            try {
+                const res = await fetch(`${API_BASE}/admin/quotes`);
+                const data = await res.json();
+                if (!data || data.length === 0) return alert('Không có dữ liệu');
+                
+                let csv = 'ID,Ngày Tạo,Khách Hàng,Email,Số Điện Thoại,Nhựa Quan Tâm,Lời Nhắn\n';
+                data.forEach(item => {
+                    const dateStr = new Date(item.CreatedAt).toLocaleString('vi-VN');
+                    csv += `"${item.Id}","${dateStr}","${item.FullName || ''}","${item.Email || ''}","${item.PhoneNumber || ''}","${item.InterestedResin || ''}","${(item.Message || '').replace(/"/g, '""')}"\n`;
+                });
+                downloadCSV(csv, `YeuCauBaoGia_${Date.now()}.csv`);
+            } catch (err) { alert('Lỗi xuất dữ liệu'); }
+        });
+    }
+
+    const exportDistributorsBtn = document.getElementById('export-distributors-btn');
+    if (exportDistributorsBtn) {
+        exportDistributorsBtn.addEventListener('click', async () => {
+            try {
+                const res = await fetch(`${API_BASE}/admin/distributors`);
+                const data = await res.json();
+                if (!data || data.length === 0) return alert('Không có dữ liệu');
+                
+                let csv = 'ID,Ngày Tạo,Công Ty,Người Liên Hệ,SĐT Zalo,Thành Phố,Sản Lượng Dự Kiến\n';
+                data.forEach(item => {
+                    const dateStr = new Date(item.CreatedAt).toLocaleString('vi-VN');
+                    csv += `"${item.Id}","${dateStr}","${item.CompanyName || ''}","${item.ContactPerson || ''}","${item.ZaloPhone || ''}","${item.City || ''}","${item.EstimatedVolume || ''}"\n`;
+                });
+                downloadCSV(csv, `DangKyDaiLy_${Date.now()}.csv`);
+            } catch (err) { alert('Lỗi xuất dữ liệu'); }
+        });
+    }
+
+    // --- IMAGE UPLOAD ---
+    const imageFileInput = document.getElementById('r-image-file');
+    if (imageFileInput) {
+        imageFileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            try {
+                const res = await fetch(`${API_BASE}/admin/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    document.getElementById('r-image').value = data.imageUrl;
+                    alert('Tải ảnh lên thành công!');
+                } else {
+                    alert('Lỗi tải ảnh: ' + (data.error || 'Unknown'));
+                }
+            } catch (err) {
+                alert('Lỗi kết nối máy chủ khi tải ảnh');
+            }
+        });
+    }
+
 });

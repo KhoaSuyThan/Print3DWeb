@@ -12,6 +12,8 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
+const multer = require('multer');
+const bcrypt = require('bcrypt');
 
 const { Groq } = require('groq-sdk');
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -154,11 +156,23 @@ app.post('/api/admin/login', loginLimiter, async (req, res) => {
         let pool = await sql.connect(dbConfig);
         let result = await pool.request()
             .input('Username', sql.NVarChar(50), username)
-            .input('PasswordHash', sql.NVarChar(255), password)
-            .query('SELECT Id, Username, Role FROM AdminUsers WHERE Username = @Username AND PasswordHash = @PasswordHash');
+            .query('SELECT Id, Username, PasswordHash, Role FROM AdminUsers WHERE Username = @Username');
             
         if (result.recordset.length > 0) {
             const user = result.recordset[0];
+            const isMatch = await bcrypt.compare(password, user.PasswordHash);
+            
+            if (!isMatch && password === user.PasswordHash && user.PasswordHash.length !== 60) {
+                const salt = await bcrypt.genSalt(10);
+                const hashedPw = await bcrypt.hash(password, salt);
+                await pool.request()
+                    .input('Id', sql.Int, user.Id)
+                    .input('NewHash', sql.NVarChar(255), hashedPw)
+                    .query('UPDATE AdminUsers SET PasswordHash = @NewHash WHERE Id = @Id');
+            } else if (!isMatch) {
+                return res.status(401).json({ error: 'Sai tài khoản hoặc mật khẩu' });
+            }
+
             const token = jwt.sign(
                 { id: user.Id, username: user.Username, role: user.Role }, 
                 process.env.JWT_SECRET, 
@@ -208,6 +222,27 @@ const verifyToken = (req, res, next) => {
         next();
     });
 };
+
+// Cấu hình Multer
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '..', 'assets', 'uploads'));
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
+
+// API Upload Ảnh (Yêu cầu Admin)
+app.post('/api/admin/upload', verifyToken, upload.single('image'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'Chưa có file nào được tải lên' });
+    }
+    const imageUrl = 'assets/uploads/' + req.file.filename;
+    res.json({ imageUrl: imageUrl });
+});
 
 // 5.5. AI Chatbot (Groq API)
 app.post('/api/chat', chatLimiter, async (req, res) => {

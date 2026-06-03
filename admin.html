@@ -135,7 +135,10 @@
 
                 <!-- Tab Quotes -->
                 <div id="tab-quotes" class="tab-content">
-                    <h2><i class="ph ph-file-text"></i> Danh sách Yêu cầu Báo giá</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2><i class="ph ph-file-text"></i> Danh sách Yêu cầu Báo giá</h2>
+                        <button id="export-quotes-btn" class="btn-outline" style="padding: 8px 16px;"><i class="ph ph-download-simple"></i> Xuất CSV</button>
+                    </div>
                     <div class="table-container">
                         <table id="quotes-table">
                             <thead>
@@ -157,7 +160,10 @@
 
                 <!-- Tab Distributors -->
                 <div id="tab-distributors" class="tab-content">
-                    <h2><i class="ph ph-handshake"></i> Danh sách Đăng ký Đại lý</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2><i class="ph ph-handshake"></i> Danh sách Đăng ký Đại lý</h2>
+                        <button id="export-distributors-btn" class="btn-outline" style="padding: 8px 16px;"><i class="ph ph-download-simple"></i> Xuất CSV</button>
+                    </div>
                     <div class="table-container">
                         <table id="distributors-table">
                             <thead>
@@ -262,7 +268,14 @@
                         <div><label>Mã (Code) *</label><input type="text" id="r-code" class="form-control" required></div>
                         <div><label>Tên Sản Phẩm *</label><input type="text" id="r-name" class="form-control" required></div>
                         <div><label>Màu Badge</label><input type="text" id="r-badgeColor" class="form-control" placeholder="VD: badge-blue"></div>
-                        <div><label>Hình Ảnh (URL)</label><input type="text" id="r-image" class="form-control" placeholder="VD: assets/images/dental.png"></div>
+                        <div>
+                            <label>Hình Ảnh (URL hoặc Upload)</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="r-image" class="form-control" placeholder="URL ảnh..." style="flex: 1;">
+                                <input type="file" id="r-image-file" accept="image/*" style="display: none;">
+                                <button type="button" class="btn-outline" onclick="document.getElementById('r-image-file').click()" title="Tải ảnh lên" style="padding: 8px; border-radius: 6px;"><i class="ph ph-upload-simple"></i></button>
+                            </div>
+                        </div>
                         <div><label>Badge Text VN</label><input type="text" id="r-badgeVi" class="form-control"></div>
                         <div><label>Badge Text EN</label><input type="text" id="r-badgeEn" class="form-control"></div>
                         <div><label>Thời gian phơi sáng TB *</label><input type="number" step="0.1" id="r-baseExp" class="form-control" required></div>
