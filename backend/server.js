@@ -181,6 +181,7 @@ app.post('/api/admin/login', loginLimiter, async (req, res) => {
             res.cookie('adminToken', token, { 
                 httpOnly: true, 
                 secure: process.env.NODE_ENV === 'production', 
+                sameSite: 'strict',
                 maxAge: 24 * 60 * 60 * 1000 
             });
             res.json({ user: { username: user.Username, role: user.Role } });
@@ -233,10 +234,35 @@ const storage = multer.diskStorage({
         cb(null, uniqueSuffix + path.extname(file.originalname));
     }
 });
-const upload = multer({ storage: storage });
+const fileFilter = (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|webp|gif/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (extname && mimetype) {
+        return cb(null, true);
+    } else {
+        cb(new Error('Chỉ cho phép upload file ảnh (JPG, PNG, WEBP, GIF)!'));
+    }
+};
+
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: fileFilter 
+});
 
 // API Upload Ảnh (Yêu cầu Admin)
-app.post('/api/admin/upload', verifyToken, upload.single('image'), (req, res) => {
+app.post('/api/admin/upload', verifyToken, (req, res, next) => {
+    upload.single('image')(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            return res.status(400).json({ error: 'Lỗi upload: ' + err.message });
+        } else if (err) {
+            return res.status(400).json({ error: err.message });
+        }
+        next();
+    });
+}, (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Chưa có file nào được tải lên' });
     }
