@@ -4,9 +4,21 @@ Nhật ký thay đổi mã nguồn của dự án RightChoiceVN.
 
 ---
 
+## [2026-07-15] - UI/UX: Nâng cấp tương phản và phối màu pastel cho Light Mode
+
+### 🎨 Cải thiện UI / UX
+- **Màu nền xám đậm rõ rệt**: Đưa màu nền chính của trang (`--bg-main`) từ trắng tinh/xám nhạt sang màu xám Slate (`#dee2e6`) để làm nổi bật các thẻ (cards) nổi phía trên.
+- **Màu nền pastel cho từng loại nhựa**: Tô màu nền nhạt tương ứng với từng chủ đề thẻ nhựa (Basic màu xanh trời nhạt, Art màu tím nhạt, Flexible màu xanh ngọc nhạt, v.v.) kèm viền 2px tương phản cao để tạo chiều sâu và phân cấp trực quan đẹp mắt.
+- **Khắc phục lỗi tương phản nút bấm**: Thiết lập thuộc tính `!important` màu chữ trắng (`#ffffff`) cho nút bấm `.btn-primary` và `.btn-secondary` trong Light Mode, tránh việc chữ bị chuyển màu tối trên nền gradient.
+- **Đồng bộ nút bấm "Tính Toán In"**: Đồng bộ toàn bộ nút bấm ở các thẻ sản phẩm sang dạng nút đặc (Solid) có màu thương hiệu riêng biệt và chữ trắng (`#ffffff`) sắc nét thay vì dùng dạng viền (Outline) có chữ tối khó đọc.
+- **Làm nổi bật ô nhập liệu**: Đặt viền 1.5px tối (`rgba(0,0,0,0.3)`) và nền trắng tinh cho `.form-control`, ngăn chặn hiện tượng mất ranh giới ô nhập liệu trên nền thẻ.
+- **Sửa lỗi tương phản thẻ thống kê (99.8%)**: Chuyển nền `.mini-stat-card` sang màu trắng mờ kính (`rgba(255, 255, 255, 0.95)`) để chữ số xanh/tím và chữ mô tả màu xám hiển thị rõ ràng trên hình nền phòng thí nghiệm.
+- **Sửa lỗi chữ biến trắng khi hover thẻ trụ cột**: Khóa màu chữ mô tả khi hover thẻ trụ cột (`.pillar-card:hover p`) ở màu xám đậm (`var(--text-secondary)`) thay vì màu trắng nhạt để tránh bị lóa trên nền sáng.
+
 ## [2026-07-15] - UI/UX & Tính năng: Tối ưu hóa giao diện toàn trang và Đồng bộ đa ngôn ngữ
 
 ### 🎨 Cải thiện UI / UX & Bố cục
+- **Tối ưu hóa Light Mode**: Sửa lỗi tương phản chữ tối trên nền tối ở phần Ngành nghề bằng cách đưa nền của `.tab-content-container` về dạng sáng mờ kính. Đồng bộ màu nền sáng mờ kính cho cả hai thẻ Form (`.quote-form-card` và `.dist-form-card`), giữ nguyên viền thương hiệu Soft Blue/Purple. Làm nổi bật tab đang hoạt động với màu gradient thương hiệu và chữ trắng sắc nét. Tối ưu hóa viền các thẻ bộ tính toán (Calculator) và thanh trượt để hài hòa trong giao diện sáng.
 - **Footer**: Thu nhỏ khoảng cách (padding/gap), cỡ chữ và margin để chân trang nhỏ gọn, tinh tế.
 - **Form Đăng ký & Báo giá**: Chia đôi màn hình cân đối (50/50), đồng bộ phong cách glassmorphism với màu sắc Cyan/Purple, đưa dropdown Tỉnh & Quận/Huyện lên cùng dòng. Loại bỏ badge "Cơ Hội Hợp Tác".
 - **Về Chúng Tôi**: Gộp phần giới thiệu sứ mệnh/khát vọng thành 1 câu duy nhất. Ảnh lab nâng chiều cao lên `310px` kèm 2 thẻ stats bay nổi mờ kính.
