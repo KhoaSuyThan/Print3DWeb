@@ -212,6 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
             "form.labelZaloPhone": "Số điện thoại Zalo",
             "form.placeholderZaloPhone": "0905 xxx xxx",
             "form.labelCity": "Tỉnh / Thành phố hoạt động",
+            "form.labelDistrict": "Quận / Huyện",
+            "form.selectProvince": "-- Chọn Tỉnh / Thành phố --",
+            "form.selectDistrict": "-- Chọn Quận / Huyện --",
             "form.placeholderCity": "Hà Nội / TP. Hồ Chí Minh",
             "form.labelVolume": "Sản lượng tiêu thụ nhựa ước tính hàng tháng",
             "form.optSmall": "Dưới 10 kg/tháng",
@@ -403,6 +406,9 @@ document.addEventListener('DOMContentLoaded', () => {
             "form.labelZaloPhone": "Zalo Phone Number",
             "form.placeholderZaloPhone": "e.g., Zalo number",
             "form.labelCity": "Operating Province / City",
+            "form.labelDistrict": "District",
+            "form.selectProvince": "-- Select Province / City --",
+            "form.selectDistrict": "-- Select District --",
             "form.placeholderCity": "e.g., Hanoi / HCMC",
             "form.labelVolume": "Estimated Monthly Consumption",
             "form.optSmall": "Less than 10 kg/month",
@@ -467,7 +473,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // 4. Update document title
         document.title = translations[currentLang].title;
 
-        // 5. Re-run calculator to update text languages
+        // 5. Re-render dynamic resins list & calculator dropdown
+        if (typeof renderResins === 'function') {
+            renderResins();
+        }
+
+        // 6. Update cascade dropdown placeholders
+        if (typeof populateProvinces === 'function') {
+            populateProvinces();
+        }
+
+        // 7. Re-run calculator to update text languages
         runCalculator();
     }
 
@@ -598,117 +614,176 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. Interactive Resin & Print Calculator Engine
     // ==========================================================================
     let resinDb = {};
+    let rawResinData = [];
 
     // Load Resins from API
     async function loadResins() {
         try {
             const response = await fetch('http://localhost:3000/api/resins');
             if (response.ok) {
-                const data = await response.json();
-                
-                const grid = document.getElementById('dynamic-products-grid');
-                const select = document.getElementById('calc-resin');
-                
-                if (grid) grid.innerHTML = '';
-                if (select) select.innerHTML = '';
-                
-                data.forEach(r => {
-                    // Populate Dictionary
-                    resinDb[r.Code] = {
-                        name: r.Name,
-                        baseExposure: r.BaseExposure,
-                        density: r.Density,
-                        stabilityVi: r.StabilityVi,
-                        stabilityEn: r.StabilityEn,
-                        adviceVi: r.AdviceVi,
-                        adviceEn: r.AdviceEn
-                    };
-                    
-                    // Render Grid Item
-                    if (grid) {
-                        const featuredClass = r.IsFeatured ? 'featured-product' : '';
-                        const glowHtml = r.IsFeatured ? '<div class="card-glow"></div>' : '';
-                        const imgHtml = r.ImageUrl ? `<div class="product-image-small"><img src="${r.ImageUrl}" class="card-prod-image"></div>` : '';
-                        
-                        const desc = currentLang === 'vi' ? r.DescriptionVi : r.DescriptionEn;
-                        const badge = currentLang === 'vi' ? r.BadgeTextVi : r.BadgeTextEn;
-                        const p1l = currentLang === 'vi' ? r.Prop1LabelVi : r.Prop1LabelEn;
-                        const p1v = currentLang === 'vi' ? r.Prop1ValueVi : r.Prop1ValueEn;
-                        const p2l = currentLang === 'vi' ? r.Prop2LabelVi : r.Prop2LabelEn;
-                        const p2v = currentLang === 'vi' ? r.Prop2ValueVi : r.Prop2ValueEn;
-                        const p3l = currentLang === 'vi' ? r.Prop3LabelVi : r.Prop3LabelEn;
-                        const p3v = currentLang === 'vi' ? r.Prop3ValueVi : r.Prop3ValueEn;
-                        
-                        const btnClass = r.IsFeatured ? 'btn-primary' : 'btn-outline';
-
-                        const html = `
-                        <div class="product-card ${featuredClass} fade-in" data-resin="${r.Code}">
-                            ${glowHtml}
-                            <div class="product-header">
-                                <span class="product-badge ${r.BadgeColor}">${badge}</span>
-                                <h3 class="product-name">${r.Name}</h3>
-                                <p class="product-desc">${desc}</p>
-                            </div>
-                            ${imgHtml}
-                            <div class="product-stats">
-                                <div class="stat-row">
-                                    <span class="stat-label">Thời gian phơi sáng</span>
-                                    <span class="stat-value">${r.StatExposureText}</span>
-                                </div>
-                                <div class="stat-bar-container">
-                                    <div class="stat-bar" style="width: ${r.StatBarWidth}%;"></div>
-                                </div>
-                                <div class="stat-details grid-3">
-                                    <div><span class="detail-label">${p1l}</span><span class="detail-val">${p1v}</span></div>
-                                    <div><span class="detail-label">${p2l}</span><span class="detail-val">${p2v}</span></div>
-                                    <div><span class="detail-label">${p3l}</span><span class="detail-val">${p3v}</span></div>
-                                </div>
-                            </div>
-                            <div class="product-footer">
-                                <a href="#calculator" class="btn ${btnClass} btn-full card-action-btn" data-select="${r.Code}">Tính Toán In</a>
-                            </div>
-                        </div>
-                        `;
-                        grid.insertAdjacentHTML('beforeend', html);
-                    }
-                    
-                    // Render Option
-                    if (select) {
-                        const optDesc = currentLang === 'vi' ? r.DescriptionVi : r.DescriptionEn;
-                        select.insertAdjacentHTML('beforeend', `<option value="${r.Code}">${r.Name} - ${optDesc.substring(0, 30)}...</option>`);
-                    }
-                });
-                
-                // Re-attach observers for newly created fade-in elements
-                document.querySelectorAll('.fade-in:not(.appear)').forEach(el => {
-                    animationObserver.observe(el);
-                });
-                
-                // Re-attach card-action-btn events
-                document.querySelectorAll('.card-action-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const resinType = button.getAttribute('data-select');
-                        if (resinType && document.getElementById('calc-resin')) {
-                            document.getElementById('calc-resin').value = resinType;
-                            runCalculator();
-                            
-                            const calcSec = document.getElementById('calculator');
-                            if (calcSec) {
-                                window.scrollTo({
-                                    top: calcSec.offsetTop - 80,
-                                    behavior: 'smooth'
-                                });
-                            }
-                        }
-                    });
-                });
-
-                runCalculator();
+                rawResinData = await response.json();
+                renderResins();
             }
         } catch (error) {
             console.error('Error fetching resins:', error);
         }
+    }
+
+    function renderResins() {
+        if (!rawResinData || rawResinData.length === 0) return;
+        const grid = document.getElementById('dynamic-products-grid');
+        const select = document.getElementById('calc-resin');
+        
+        // Lưu lại giá trị đang chọn để không bị reset khi render lại ngôn ngữ
+        const currentSelectedResin = select ? select.value : '';
+
+        // Kiểm tra xem grid đã được vẽ lần nào chưa (nếu đã có thẻ con thì chỉ cần dịch text tại chỗ)
+        const isAlreadyRendered = grid && grid.children.length > 0;
+
+        if (!isAlreadyRendered) {
+            if (grid) grid.innerHTML = '';
+        }
+        
+        // Luôn clear và nạp lại select option vì nó đơn giản và không có hiệu ứng fade-in gây khó chịu
+        if (select) select.innerHTML = '';
+
+        rawResinData.forEach(r => {
+            // Populate Dictionary
+            resinDb[r.Code] = {
+                name: r.Name,
+                baseExposure: r.BaseExposure,
+                density: r.Density,
+                stabilityVi: r.StabilityVi,
+                stabilityEn: r.StabilityEn,
+                adviceVi: r.AdviceVi,
+                adviceEn: r.AdviceEn
+            };
+            
+            const desc = currentLang === 'vi' ? r.DescriptionVi : r.DescriptionEn;
+            const badge = currentLang === 'vi' ? r.BadgeTextVi : r.BadgeTextEn;
+            const p1l = currentLang === 'vi' ? r.Prop1LabelVi : r.Prop1LabelEn;
+            const p1v = currentLang === 'vi' ? r.Prop1ValueVi : r.Prop1ValueEn;
+            const p2l = currentLang === 'vi' ? r.Prop2LabelVi : r.Prop2LabelEn;
+            const p2v = currentLang === 'vi' ? r.Prop2ValueVi : r.Prop2ValueEn;
+            const p3l = currentLang === 'vi' ? r.Prop3LabelVi : r.Prop3LabelEn;
+            const p3v = currentLang === 'vi' ? r.Prop3ValueVi : r.Prop3ValueEn;
+            
+            const btnText = currentLang === 'vi' ? 'Tính Toán In' : 'Calculate Print Settings';
+            const expLabel = currentLang === 'vi' ? 'Thời gian phơi sáng' : 'Exposure Time';
+
+            if (isAlreadyRendered) {
+                // Dịch trực tiếp trên DOM của card đang có sẵn
+                const card = grid.querySelector(`.product-card[data-resin="${r.Code}"]`);
+                if (card) {
+                    const badgeEl = card.querySelector('.product-badge');
+                    if (badgeEl) badgeEl.textContent = badge;
+                    
+                    const descEl = card.querySelector('.product-desc');
+                    if (descEl) descEl.textContent = desc;
+                    
+                    const expLabelEl = card.querySelector('.stat-label');
+                    if (expLabelEl) expLabelEl.textContent = expLabel;
+                    
+                    const detailLabels = card.querySelectorAll('.detail-label');
+                    if (detailLabels.length >= 3) {
+                        detailLabels[0].textContent = p1l;
+                        detailLabels[1].textContent = p2l;
+                        detailLabels[2].textContent = p3l;
+                    }
+
+                    const detailVals = card.querySelectorAll('.detail-val');
+                    if (detailVals.length >= 3) {
+                        detailVals[0].textContent = p1v;
+                        detailVals[1].textContent = p2v;
+                        detailVals[2].textContent = p3v;
+                    }
+                    
+                    const btnEl = card.querySelector('.card-action-btn');
+                    if (btnEl) btnEl.textContent = btnText;
+                }
+            } else {
+                // Vẽ mới hoàn toàn (chỉ chạy 1 lần khi load trang)
+                if (grid) {
+                    const featuredClass = r.IsFeatured ? 'featured-product' : '';
+                    const glowHtml = r.IsFeatured ? '<div class="card-glow"></div>' : '';
+                    const imgHtml = r.ImageUrl ? `<div class="product-image-small"><img src="${r.ImageUrl}" class="card-prod-image"></div>` : '';
+                    const btnClass = r.IsFeatured ? 'btn-primary' : 'btn-outline';
+
+                    const html = `
+                    <div class="product-card ${featuredClass} fade-in" data-resin="${r.Code}">
+                        ${glowHtml}
+                        <div class="product-header">
+                            <span class="product-badge ${r.BadgeColor}">${badge}</span>
+                            <h3 class="product-name">${r.Name}</h3>
+                            <p class="product-desc">${desc}</p>
+                        </div>
+                        ${imgHtml}
+                        <div class="product-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">${expLabel}</span>
+                                <span class="stat-value">${r.StatExposureText}</span>
+                            </div>
+                            <div class="stat-bar-container">
+                                <div class="stat-bar" style="width: ${r.StatBarWidth}%;"></div>
+                            </div>
+                            <div class="stat-details grid-3">
+                                <div><span class="detail-label">${p1l}</span><span class="detail-val">${p1v}</span></div>
+                                <div><span class="detail-label">${p2l}</span><span class="detail-val">${p2v}</span></div>
+                                <div><span class="detail-label">${p3l}</span><span class="detail-val">${p3v}</span></div>
+                            </div>
+                        </div>
+                        <div class="product-footer">
+                            <a href="#calculator" class="btn ${btnClass} btn-full card-action-btn" data-select="${r.Code}">${btnText}</a>
+                        </div>
+                    </div>
+                    `;
+                    grid.insertAdjacentHTML('beforeend', html);
+                }
+            }
+            
+            // Render Option
+            if (select) {
+                const optDesc = currentLang === 'vi' ? r.DescriptionVi : r.DescriptionEn;
+                select.insertAdjacentHTML('beforeend', `<option value="${r.Code}">${r.Name} - ${optDesc.substring(0, 30)}...</option>`);
+            }
+        });
+        
+        // Khôi phục giá trị đã chọn
+        if (select && currentSelectedResin) {
+            select.value = currentSelectedResin;
+        }
+        
+        if (!isAlreadyRendered) {
+            // Re-attach observers for newly created fade-in elements
+            if (typeof animationObserver !== 'undefined' && animationObserver.observe) {
+                document.querySelectorAll('.fade-in:not(.appear)').forEach(el => {
+                    animationObserver.observe(el);
+                });
+            }
+            
+            // Re-attach card-action-btn events
+            document.querySelectorAll('.card-action-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const resinType = button.getAttribute('data-select');
+                    if (resinType && document.getElementById('calc-resin')) {
+                        document.getElementById('calc-resin').value = resinType;
+                        runCalculator();
+                        
+                        const calcSec = document.getElementById('calculator');
+                        if (calcSec) {
+                            window.scrollTo({
+                                top: calcSec.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        }
+
+        // Chạy lại calculator sau khi update danh sách resin
+        runCalculator();
     }
     loadResins();
 
@@ -962,9 +1037,11 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.style.opacity = '0.75';
 
             const company = document.getElementById('d-company').value;
-            const contact = document.getElementById('d-contact').value;
+            const contact = document.getElementById('d-name').value;
             const phone = document.getElementById('d-phone').value;
-            const city = document.getElementById('d-city').value;
+            const province = document.getElementById('d-province').value;
+            const district = document.getElementById('d-district').value;
+            const city = district ? `${province} - ${district}` : province;
             const volume = document.getElementById('d-volume').value;
 
             try {
@@ -978,6 +1055,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const successMsg = t["toast.distSuccessMsg"].replace('{company}', company);
                     showToast(t["toast.distSuccessTitle"], successMsg, 'success');
                     distributorForm.reset();
+                    // Reset dropdowns after form reset
+                    if (typeof populateProvinces === 'function') {
+                        populateProvinces();
+                    }
                 } else {
                     let errMsg = 'Không thể gửi đăng ký. / Cannot submit application.';
                     try {
@@ -994,6 +1075,71 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.textContent = originalText;
                 submitBtn.style.opacity = '1';
             }
+        });
+    }
+
+    // ==========================================================================
+    // Cascade Dropdown Tỉnh/Thành & Quận/Huyện + Ràng buộc số điện thoại
+    // ==========================================================================
+    function restrictPhoneInput(el) {
+        if (!el) return;
+        el.addEventListener('input', () => {
+            el.value = el.value.replace(/[^0-9+\s\-()]/g, '');
+        });
+    }
+    restrictPhoneInput(document.getElementById('q-phone'));
+    restrictPhoneInput(document.getElementById('d-phone'));
+
+    const provinceSelect  = document.getElementById('d-province');
+    const districtSelect  = document.getElementById('d-district');
+
+    function populateProvinces() {
+        if (!provinceSelect || !districtSelect || typeof VIETNAM_PROVINCES === 'undefined') return;
+
+        const currentProvince = provinceSelect.value;
+        const currentDistrict = districtSelect.value;
+
+        // Reset province list
+        provinceSelect.innerHTML = `<option value="">${translations[currentLang]["form.selectProvince"] || '-- Chọn Tỉnh / Thành phố --'}</option>`;
+        Object.keys(VIETNAM_PROVINCES).sort().forEach(p => {
+            provinceSelect.insertAdjacentHTML('beforeend',
+                `<option value="${p}">${p}</option>`);
+        });
+
+        // Restore province selection
+        if (currentProvince && VIETNAM_PROVINCES[currentProvince]) {
+            provinceSelect.value = currentProvince;
+        }
+
+        // Reset district list
+        districtSelect.innerHTML = `<option value="">${translations[currentLang]["form.selectDistrict"] || '-- Chọn Quận / Huyện --'}</option>`;
+        
+        const districts = VIETNAM_PROVINCES[provinceSelect.value] || [];
+        districts.forEach(d => {
+            districtSelect.insertAdjacentHTML('beforeend',
+                `<option value="${d}">${d}</option>`);
+        });
+        districtSelect.disabled = districts.length === 0;
+
+        // Restore district selection
+        if (currentDistrict && districts.includes(currentDistrict)) {
+            districtSelect.value = currentDistrict;
+        }
+    }
+
+    if (provinceSelect && districtSelect && typeof VIETNAM_PROVINCES !== 'undefined') {
+        // Initialize once
+        populateProvinces();
+
+        // Khi chọn tỉnh → populate quận/huyện
+        provinceSelect.addEventListener('change', () => {
+            const districts = VIETNAM_PROVINCES[provinceSelect.value] || [];
+            districtSelect.innerHTML = `<option value="">${translations[currentLang]["form.selectDistrict"] || '-- Chọn Quận / Huyện --'}</option>`;
+            districts.forEach(d => {
+                districtSelect.insertAdjacentHTML('beforeend',
+                    `<option value="${d}">${d}</option>`);
+            });
+            districtSelect.disabled = districts.length === 0;
         });
     }
 
