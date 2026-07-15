@@ -152,10 +152,7 @@
                     <div class="about-story">
                         <h3 data-i18n="about.storyTitle">Sứ Mệnh Khát Vọng</h3>
                         <p class="story-lead" data-i18n="about.storyLead">
-                            Mang cơ hội tiếp cận dòng nhựa in 3D chất lượng đẳng cấp thế giới đến từng nhà sáng chế, xưởng dịch vụ và khách hàng công nghiệp tại Việt Nam.
-                        </p>
-                        <p data-i18n="about.storyDesc">
-                            Chúng tôi tin rằng tốc độ, chất lượng và niềm tin nội địa phải song hành. RightChoiceVN không chỉ là nhà sản xuất hạt nhựa quang học quang trùng hợp (photopolymer) hiệu năng cao đầu tiên tại Việt Nam, mà còn là đối tác đồng hành tin cậy kiến tạo nên sự phát triển bền vững của hệ sinh thái in 3D nước nhà.
+                            Là nhà sản xuất nhựa in 3D photopolymer hiệu năng cao đầu tiên tại Việt Nam, RightChoiceVN cam kết mang đến sản phẩm chất lượng đẳng cấp thế giới cùng dịch vụ tốc độ vượt trội, đồng hành kiến tạo hệ sinh thái in 3D nước nhà bền vững.
                         </p>
                         <div class="about-checklist">
                             <div class="check-item">
@@ -497,7 +494,7 @@
                 <div class="forms-wrapper">
                     
                     <!-- Instant Quote Form -->
-                    <div class="form-card">
+                    <div class="form-card quote-form-card">
                         <h3 data-i18n="form.quoteTitle">Nhận Báo Giá Siêu Tốc ⚡</h3>
                         <p class="form-desc" data-i18n="form.quoteDesc">Hãy để lại thông tin của bạn, đội ngũ hỗ trợ kỹ thuật của chúng tôi sẽ gọi lại và gửi báo giá chi tiết trong vòng 10 phút làm việc.</p>
                         
@@ -513,7 +510,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="q-phone"><span data-i18n="form.labelPhone">Số điện thoại</span> <span class="required">*</span></label>
-                                    <input type="tel" id="q-phone" class="form-control" placeholder="0398 xxx xxx" data-i18n-placeholder="form.placeholderPhone" required>
+                                    <input type="tel" id="q-phone" class="form-control" placeholder="0398 xxx xxx" data-i18n-placeholder="form.placeholderPhone" inputmode="numeric" pattern="[0-9+\s\-()]*" required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -537,8 +534,7 @@
                     </div>
 
                     <!-- Distributor Application Form -->
-                    <div class="form-card dark-form-card">
-                        <div class="card-badge" data-i18n="form.distBadge">Cơ Hội Hợp Tác</div>
+                    <div class="form-card dist-form-card">
                         <h3 data-i18n="form.distTitle">Đăng Ký Làm Đại Lý Phân Phối 🤝</h3>
                         <p class="form-desc" data-i18n="form.distDesc">RightChoiceVN cam kết chính sách chiết khấu đại lý tốt nhất, hỗ trợ kỹ thuật trực tiếp từ nhà máy và đảm bảo nguồn cung dồi dào, ổn định cao.</p>
                         
@@ -554,12 +550,23 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="d-phone"><span data-i18n="form.labelZaloPhone">Số điện thoại Zalo</span> <span class="required">*</span></label>
-                                    <input type="tel" id="d-phone" class="form-control" placeholder="0905 xxx xxx" data-i18n-placeholder="form.placeholderZaloPhone" required>
+                                    <input type="tel" id="d-phone" class="form-control" placeholder="0905 xxx xxx" data-i18n-placeholder="form.placeholderZaloPhone" inputmode="numeric" pattern="[0-9+\s\-()]*" required>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="d-city"><span data-i18n="form.labelCity">Tỉnh / Thành phố hoạt động</span> <span class="required">*</span></label>
-                                <input type="text" id="d-city" class="form-control" placeholder="Hà Nội / TP. Hồ Chí Minh" data-i18n-placeholder="form.placeholderCity" required>
+                            <!-- Cascading dropdown: Tỉnh/TP → Quận/Huyện -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="d-province"><span data-i18n="form.labelCity">Tỉnh / Thành phố hoạt động</span> <span class="required">*</span></label>
+                                    <select id="d-province" class="form-control" required>
+                                        <option value="">-- Chọn Tỉnh / Thành phố --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="d-district"><span data-i18n="form.labelDistrict">Quận / Huyện</span> <span class="required">*</span></label>
+                                    <select id="d-district" class="form-control" required disabled>
+                                        <option value="">-- Chọn Quận / Huyện --</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="d-volume" data-i18n="form.labelVolume">Sản lượng tiêu thụ nhựa ước tính hàng tháng</label>
@@ -709,6 +716,7 @@
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Script JS -->
+    <script src="provinces-data.js"></script>
     <script src="main.js"></script>
 </body>
 </html>
