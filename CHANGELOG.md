@@ -4,6 +4,13 @@ Nhật ký thay đổi mã nguồn của dự án RightChoiceVN.
 
 ---
 
+## [2026-07-17] - Sửa lỗi: Cấu hình Cơ sở dữ liệu và Dependencies khi clone dự án
+
+### ⚙️ Hệ thống & Sửa lỗi
+- **Cập nhật CSDL tự động**: Thêm các câu lệnh kiểm tra và tạo database `RightChoiceVN` tự động ở đầu tệp `database.sql` để tránh lỗi khi chạy script.
+- **Sửa tài liệu hướng dẫn**: Đính chính hệ quản trị CSDL yêu cầu là **Microsoft SQL Server** trong `README.md`, đồng thời cập nhật đúng mô tả file cấu hình `.env` khớp với backend.
+- **Đồng bộ Dependencies**: Gộp toàn bộ các thư viện backend (`express`, `cors`, `jsonwebtoken`, `mssql`, `msnodesqlv8`, `dotenv`) vào tệp `package.json` ở thư mục gốc của dự án, giúp người dùng cài đặt toàn bộ dependencies chỉ với một lệnh duy nhất.
+
 ## [2026-07-15] - UI/UX: Nâng cấp tương phản và phối màu pastel cho Light Mode
 
 ### 🎨 Cải thiện UI / UX
