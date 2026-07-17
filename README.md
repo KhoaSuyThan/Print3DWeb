@@ -16,7 +16,7 @@ RightChoiceVN là dự án phát triển nền tảng website cho nhà sản xu�
 ## Công nghệ sử dụng
 - **Front-end:** HTML5, CSS3 (Custom properties, Flexbox/Grid, Animations), Vanilla JavaScript.
 - **Back-end:** Node.js, Express.js.
-- **Database:** SQL (được cấu hình qua tệp `database.sql`).
+- **Database:** Microsoft SQL Server (được cấu hình qua tệp `database.sql`).
 - **Dependencies chính:** `express-validator`, `express-rate-limit`, `multer` (xử lý file upload), `bcrypt` (mã hóa mật khẩu), `cookie-parser`, `groq-sdk` (tích hợp trợ lý AI).
 
 ## Hướng dẫn cài đặt và chạy dự án
@@ -24,7 +24,7 @@ RightChoiceVN là dự án phát triển nền tảng website cho nhà sản xu�
 ### Yêu cầu hệ thống
 - **Node.js** (Khuyến nghị phiên bản v16.x trở lên)
 - **npm** (trình quản lý gói đi kèm với Node.js)
-- **Cơ sở dữ liệu SQL** (MySQL/MariaDB,...)
+- **Cơ sở dữ liệu SQL** (Microsoft SQL Server v16.x trở lên hoặc SQL Server Express / LocalDB)
 
 ### Các bước cài đặt
 
@@ -35,17 +35,15 @@ RightChoiceVN là dự án phát triển nền tảng website cho nhà sản xu�
    ```
 
 2. **Thiết lập Cơ sở dữ liệu:**
-   - Tạo một database mới trong hệ quản trị cơ sở dữ liệu của bạn.
-   - Import cấu trúc bảng và dữ liệu mẫu từ file `database.sql` vào database vừa tạo.
+   - Chạy script trong file `database.sql` trên SQL Server của bạn (qua SQL Server Management Studio hoặc sqlcmd) để tự động khởi tạo database `RightChoiceVN` cùng các bảng và dữ liệu mẫu cần thiết.
 
 3. **Cấu hình biến môi trường:**
-   Tạo file `.env` trong thư mục `backend` (hoặc thư mục gốc tuỳ thuộc vào cách load environment trong `server.js`) và điền các thông tin bảo mật cần thiết:
+   - Tạo file `.env` trong thư mục `backend` và điền các thông tin cấu hình cần thiết:
    ```env
+   DB_SERVER=localhost
+   DB_NAME=RightChoiceVN
    PORT=3000
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASS=
-   DB_NAME=rightchoicevn_db
+   JWT_SECRET=SieuBaoMat12345!
    GROQ_API_KEY=your_groq_api_key
    ```
 
